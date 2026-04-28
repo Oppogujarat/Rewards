@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0c0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chain Rewards">
+<meta name="description" content="Store manager reward & redemption platform">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" href="icons/icon-96.png">
+<title>Chain Rewards</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0c0f1a;--bg2:#141b2d;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#4a5568;--gold:#fbbf24;--gold2:#f59e0b;--gold3:#d97706;--green:#34d399;--green-bg:rgba(16,185,129,0.15);--red:#f87171;--red-bg:rgba(239,68,68,0.15);--blue:#3b82f6;--purple:#8b5cf6}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+input,select,button{font-family:inherit}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+
+/* Splash */
+.splash{height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.splash .spinner{width:48px;height:48px;border:3px solid rgba(251,191,36,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Login */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;background:linear-gradient(160deg,#0c0f1a 0%,#141b2d 40%,#1a1f35 100%)}
+.login-card{width:100%;max-width:380px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:20px;padding:36px 28px;backdrop-filter:blur(20px)}
+.login-logo{width:60px;height:60px;background:linear-gradient(135deg,var(--gold2),var(--gold3));border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(245,158,11,.25)}
+.login-title{font-size:26px;font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
+.login-sub{font-size:14px;color:var(--text3);margin-bottom:28px}
+.input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:12px;color:#f1f5f9;font-size:15px;outline:none;transition:border-color .2s}
+.input:focus{border-color:var(--gold2)}
+select.input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select.input option{background:#1e293b;color:#e2e8f0}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold2),var(--gold3));border:none;border-radius:12px;color:#0f172a;font-size:15px;font-weight:600;cursor:pointer;transition:transform .12s,box-shadow .12s;letter-spacing:.01em}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn-outline{width:100%;padding:13px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--text2);font-size:14px;cursor:pointer}
+.btn-back{background:none;border:none;color:var(--text3);cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px;font-size:13px;padding:0}
+.otp-row{display:flex;gap:12px;justify-content:center;margin-bottom:24px}
+.otp-box{width:54px;height:58px;text-align:center;font-size:24px;font-weight:600;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:12px;color:#f1f5f9;outline:none;transition:border-color .2s}
+.otp-box:focus{border-color:var(--gold)}
+.error{color:#ef4444;font-size:13px;margin-top:8px}
+.hint{color:#334155;font-size:11px;text-align:center;margin-top:20px}
+
+/* Header */
+.header{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.header-left p:first-child{font-size:12px;color:var(--text3)}
+.header-left p:last-child{font-size:17px;font-weight:600}
+.header-actions{display:flex;align-items:center;gap:10px}
+.header-actions button{background:none;border:none;color:var(--text2);cursor:pointer;position:relative;padding:4px}
+.notif-badge{position:absolute;top:-2px;right:-2px;width:15px;height:15px;background:#ef4444;border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+
+/* Content */
+.content{flex:1;padding:0 20px 100px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* Points card */
+.points-card{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(217,119,6,.08));border:1px solid rgba(245,158,11,.2);border-radius:20px;padding:24px 22px;margin:16px 0;position:relative;overflow:hidden}
+.points-card .orb{position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(245,158,11,.08);border-radius:50%}
+.points-label{font-size:11px;color:var(--gold3);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.points-value{font-size:40px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:2px}
+.points-store{font-size:13px;color:#92743a}
+.rank-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--green-bg);color:var(--green);margin-top:12px}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:10px}
+.card-sm{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px}
+
+/* Quick actions */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.quick-btn{display:flex;align-items:center;gap:11px;padding:14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;cursor:pointer;color:var(--text)}
+.quick-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quick-label{font-size:13px;font-weight:500}
+
+/* Section title */
+.section-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:12px}
+
+/* Transaction row */
+.tx-row{display:flex;justify-content:space-between;align-items:center}
+.tx-info p:first-child{font-size:13px;font-weight:500;margin-bottom:2px}
+.tx-info p:last-child{font-size:11px;color:var(--text4)}
+.tx-amount{font-size:15px;font-weight:700}
+.tx-credit{color:var(--green)}
+.tx-debit{color:var(--red)}
+
+/* Reward item */
+.reward-row{display:flex;gap:14px;align-items:center}
+.reward-icon{width:52px;height:52px;border-radius:13px;background:rgba(245,158,11,.08);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.reward-info{flex:1;min-width:0}
+.reward-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.reward-desc{font-size:11px;color:var(--text3);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reward-meta{display:flex;align-items:center;gap:8px}
+.pts-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:16px;font-size:11px;font-weight:600;background:rgba(245,158,11,.12);color:var(--gold)}
+.stock-label{font-size:11px}
+.btn-redeem{padding:8px 13px;border-radius:10px;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:transform .1s}
+.btn-redeem:active{transform:scale(.95)}
+.btn-redeem.active{background:linear-gradient(135deg,var(--gold2),var(--gold3));color:#0f172a}
+.btn-redeem.disabled{background:rgba(255,255,255,.06);color:var(--text4);cursor:not-allowed}
+
+/* Cats scroll */
+.cats{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.cats::-webkit-scrollbar{display:none}
+.cat-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0}
+.cat-pill.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:var(--gold)}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.lb-avatar{width:34px;height:34px;border-radius:9px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0}
+.lb-name{font-size:13px;font-weight:500}
+.lb-store{font-size:11px;color:var(--text4)}
+.lb-pts{font-size:15px;font-weight:700;color:var(--gold)}
+.lb-you{font-size:10px;color:var(--gold);margin-left:4px}
+.lb-highlight{border:1px solid rgba(245,158,11,.25) !important;border-radius:12px;padding:10px 12px;margin:-1px -12px}
+
+/* Notifications */
+.notif-item{border-left:3px solid transparent;padding-left:4px}
+.notif-item.unread{border-left-color:var(--gold)}
+.notif-msg{font-size:13px;margin-bottom:3px;line-height:1.4}
+.notif-date{font-size:11px;color:var(--text4)}
+
+/* History dot */
+.tx-dot{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0}
+
+/* Bottom nav */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(12,15,26,.96);border-top:1px solid var(--border);display:flex;padding:6px 0 max(10px, env(safe-area-inset-bottom));backdrop-filter:blur(20px);z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;font-size:10px;cursor:pointer;padding:6px 0;transition:color .15s}
+.nav-item.active{color:var(--gold)}
+.nav-item:not(.active){color:var(--text4)}
+
+/* Modal overlay */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s}
+.modal-card{background:#1e293b;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;text-align:center;animation:slideUp .25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-icon{font-size:48px;margin-bottom:14px}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:6px}
+.modal-sub{color:var(--text2);font-size:14px;margin-bottom:16px}
+.modal-balance{color:var(--text3);font-size:13px;margin-bottom:22px}
+.modal-actions{display:flex;gap:12px}
+.modal-actions button{flex:1;padding:12px;border-radius:12px;font-size:14px;cursor:pointer}
+.modal-cancel{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--text2)}
+.modal-confirm{background:linear-gradient(135deg,var(--gold2),var(--gold3));border:none;color:#0f172a;font-weight:600}
+
+/* Toast */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#065f46;color:#a7f3d0;padding:12px 20px;border-radius:12px;z-index:200;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:slideDown .3s ease}
+@keyframes slideDown{from{transform:translate(-50%,-20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+
+/* Install banner */
+.install-banner{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(217,119,6,.06));border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:14px 16px;margin:16px 0;display:flex;align-items:center;gap:12px}
+.install-banner p{font-size:12px;color:var(--text2);line-height:1.4}
+.install-banner .btn{width:auto;padding:8px 16px;font-size:12px;flex-shrink:0}
+
+/* Page title */
+.page-title{font-size:20px;font-weight:700;margin:18px 0 14px}
+
+/* Admin sidebar (desktop only) */
+@media(min-width:768px){
+  .admin-shell{display:flex;min-height:100vh}
+  .admin-sidebar{width:220px;background:rgba(255,255,255,.02);border-right:1px solid var(--border);padding:24px 0;position:fixed;height:100vh;overflow-y:auto}
+  .admin-main{flex:1;margin-left:220px;padding:24px 32px;overflow-y:auto}
+}
+@media(max-width:767px){
+  .admin-sidebar{display:none}
+  .admin-main{padding:16px 20px;padding-bottom:100px}
+  .admin-nav-mobile{position:fixed;bottom:0;left:0;width:100%;background:rgba(12,15,26,.96);border-top:1px solid var(--border);display:flex;padding:6px 0 max(10px,env(safe-area-inset-bottom));backdrop-filter:blur(20px);z-index:100}
+}
+.admin-nav-btn{width:100%;padding:10px 20px;background:none;border:none;border-left:3px solid transparent;color:var(--text3);font-size:13px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;transition:all .15s}
+.admin-nav-btn.active{background:rgba(245,158,11,.1);border-left-color:var(--gold);color:var(--gold);font-weight:600}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{border-radius:14px;padding:18px 20px}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.stat-val{font-size:26px;font-weight:700}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:11px 12px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04)}
+.status-badge{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:500;display:inline-block}
+.btn-sm{padding:6px 12px;border-radius:8px;border:none;font-size:12px;cursor:pointer;font-weight:500}
+.admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.admin-modal-card{background:#1e293b;border-radius:20px;padding:24px;width:100%;max-width:420px}
+.admin-modal-card h3{font-size:18px;font-weight:600;margin-bottom:16px}
+.admin-modal-card .input{margin-bottom:10px}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bar-track{height:6px;border-radius:3px;background:rgba(255,255,255,.06)}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+
+/* Pending count in nav */
+.pending-dot{margin-left:auto;background:#ef4444;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px}
+
+/* SVG icons inline */
+svg{display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<div id="app" class="app">
+  <div class="splash">
+    <div class="spinner"></div>
+    <p style="color:var(--text3);font-size:13px">Loading Chain Rewards...</p>
+  </div>
+</div>
+
+<script>
+// ─── Storage ───
+const DB_KEY = 'chain_rewards_db';
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+
+function saveDB(db) {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e) {}
+}
+
+// ─── Default Data ───
+const DEFAULTS = {
+  managers: [
+    {id:"MGR001",name:"Raj Patel",phone:"+91 98765 43210",store:"Navrangpura Branch",points:2450,status:"active",joinDate:"2025-03-15",avatar:"RP"},
+    {id:"MGR002",name:"Priya Shah",phone:"+91 87654 32109",store:"SG Highway Branch",points:1820,status:"active",joinDate:"2025-01-20",avatar:"PS"},
+    {id:"MGR003",name:"Amit Desai",phone:"+91 76543 21098",store:"Satellite Branch",points:3100,status:"active",joinDate:"2024-11-05",avatar:"AD"},
+    {id:"MGR004",name:"Sneha Joshi",phone:"+91 65432 10987",store:"Maninagar Branch",points:980,status:"active",joinDate:"2025-06-10",avatar:"SJ"},
+    {id:"MGR005",name:"Kiran Modi",phone:"+91 54321 09876",store:"Vastrapur Branch",points:4200,status:"active",joinDate:"2024-08-22",avatar:"KM"},
+  ],
+  rewards: [
+    {id:"RW001",name:"PVR Movie Ticket",category:"Entertainment",points:500,stock:50,image:"🎬",description:"Single movie ticket at any PVR cinema"},
+    {id:"RW002",name:"Amazon ₹500 Voucher",category:"Shopping",points:800,image:"🛒",stock:30,description:"₹500 Amazon gift card"},
+    {id:"RW003",name:"Swiggy ₹300 Voucher",category:"Food",points:400,image:"🍔",stock:100,description:"₹300 Swiggy food delivery voucher"},
+    {id:"RW004",name:"Flipkart ₹1000 Voucher",category:"Shopping",points:1200,image:"🏷️",stock:20,description:"₹1000 Flipkart shopping voucher"},
+    {id:"RW005",name:"Spa Day Pass",category:"Wellness",points:1500,image:"💆",stock:15,description:"Full day spa treatment at partner salon"},
+    {id:"RW006",name:"BookMyShow ₹250",category:"Entertainment",points:350,image:"🎭",stock:40,description:"₹250 BookMyShow voucher for events"},
+    {id:"RW007",name:"Branded T-Shirt",category:"Merchandise",points:600,image:"👕",stock:25,description:"Premium company branded T-shirt"},
+    {id:"RW008",name:"Weekend Getaway",category:"Travel",points:5000,image:"✈️",stock:5,description:"Weekend stay at partner resort"},
+  ],
+  transactions: [
+    {id:"TX001",managerId:"MGR001",type:"credit",points:500,reason:"Monthly target achieved",date:"2026-04-15",by:"Admin"},
+    {id:"TX002",managerId:"MGR001",type:"debit",points:200,reason:"Redeemed: Swiggy Voucher",date:"2026-04-10",by:"System"},
+    {id:"TX003",managerId:"MGR003",type:"credit",points:1000,reason:"Quarterly bonus",date:"2026-04-01",by:"Admin"},
+    {id:"TX004",managerId:"MGR005",type:"credit",points:800,reason:"Best performer - March",date:"2026-03-31",by:"Admin"},
+    {id:"TX005",managerId:"MGR002",type:"debit",points:500,reason:"Redeemed: PVR Movie Ticket",date:"2026-04-20",by:"System"},
+  ],
+  notifications: [
+    {id:"N001",managerId:"MGR001",message:"You earned 500 points for achieving monthly target!",date:"2026-04-15",read:false},
+    {id:"N002",managerId:"MGR001",message:"New reward added: Weekend Getaway Voucher",date:"2026-04-12",read:true},
+  ],
+  redemptions: [
+    {id:"RD001",managerId:"MGR001",rewardId:"RW003",rewardName:"Swiggy ₹300 Voucher",points:400,status:"approved",date:"2026-04-10"},
+    {id:"RD002",managerId:"MGR002",rewardId:"RW001",rewardName:"PVR Movie Ticket",points:500,status:"pending",date:"2026-04-20"},
+    {id:"RD003",managerId:"MGR005",rewardId:"RW004",rewardName:"Flipkart ₹1000 Voucher",points:1200,status:"approved",date:"2026-04-18"},
+  ],
+};
+
+let db = loadDB() || JSON.parse(JSON.stringify(DEFAULTS));
+let state = { screen:'login', loginStep:'select', role:null, managerId:null, tab:'home', phone:'', otp:['','','',''], adminPass:'', error:'', selectedReward:null, showConfirm:false, toast:'', catFilter:'All', searchQ:'', showAddPoints:null, pointsAmt:'', pointsReason:'', showAddReward:false, showAddManager:false, newReward:{name:'',category:'Shopping',points:'',stock:'',description:'',image:'🎁'}, newManager:{name:'',phone:'',store:''} };
+let deferredPrompt = null;
+
+// ─── PWA Install ───
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; render(); });
+
+function installPWA() {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; render(); }); }
+}
+
+// ─── SVG Icons ───
+const icons = {
+  home:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg>`,
+  gift:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 010-5C9 3 12 8 12 8s3-5 4.5-5a2.5 2.5 0 010 5"/></svg>`,
+  history:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  bell:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
+  chart:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  back:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+  trophy:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>`,
+  logout:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  check:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  x:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  plus:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  users:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,
+  coins:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1110.34 18"/></svg>`,
+};
+
+function icon(name, size) {
+  let s = icons[name] || '';
+  if (size) s = s.replace(/width="\d+"/, `width="${size}"`).replace(/height="\d+"/, `height="${size}"`);
+  return s;
+}
+
+// ─── Helpers ───
+function getManager() { return db.managers.find(m => m.id === state.managerId); }
+function getMyTx() { return db.transactions.filter(t => t.managerId === state.managerId); }
+function getMyNotifs() { return db.notifications.filter(n => n.managerId === state.managerId); }
+function getMyRedemptions() { return db.redemptions.filter(r => r.managerId === state.managerId); }
+function getRank() { const sorted = [...db.managers].sort((a,b) => b.points - a.points); return sorted.findIndex(m => m.id === state.managerId) + 1; }
+function showToast(msg) { state.toast = msg; render(); setTimeout(() => { state.toast = ''; render(); }, 3000); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ─── Render ───
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') { app.innerHTML = renderLogin(); bindLogin(); }
+  else if (state.role === 'manager') { app.innerHTML = renderManager(); bindManager(); }
+  else { app.innerHTML = renderAdmin(); bindAdmin(); }
+}
+
+// ─── LOGIN ───
+function renderLogin() {
+  let inner = '';
+  if (state.loginStep === 'select') {
+    inner = `
+      <div class="login-logo">${icon('trophy')}</div>
+      <h1 class="login-title">Chain Rewards</h1>
+      <p class="login-sub">Store manager reward & redemption platform</p>
+      <button class="btn" id="goto-phone">Manager Login</button>
+      <div style="height:12px"></div>
+      <button class="btn-outline" id="goto-admin">Admin Panel</button>
+    `;
+  } else if (state.loginStep === 'phone') {
+    let opts = db.managers.map(m => `<option value="${m.phone}">${m.name} — ${m.store}</option>`).join('');
+    inner = `
+      <button class="btn-back" id="back-select">${icon('back')} Back</button>
+      <h1 class="login-title">Welcome back</h1>
+      <p class="login-sub">Select your account to continue</p>
+      <select class="input" id="phone-select" style="margin-bottom:14px"><option value="">Select your account</option>${opts}</select>
+      <button class="btn" id="send-otp" ${state.phone?'':'disabled'}>Send OTP</button>
+    `;
+  } else if (state.loginStep === 'otp') {
+    inner = `
+      <button class="btn-back" id="back-phone">${icon('back')} Back</button>
+      <h1 class="login-title">Verify OTP</h1>
+      <p class="login-sub">Enter the 4-digit code (use 1234)</p>
+      <div class="otp-row">${[0,1,2,3].map(i => `<input class="otp-box" id="otp${i}" type="text" inputmode="numeric" maxlength="1" value="${state.otp[i]}">`).join('')}</div>
+      ${state.error ? `<p class="error">${state.error}</p>` : ''}
+      <button class="btn" id="verify-otp">Verify & Login</button>
+    `;
+  } else {
+    inner = `
+      <button class="btn-back" id="back-select2">${icon('back')} Back</button>
+      <h1 class="login-title">Admin Access</h1>
+      <p class="login-sub">Enter admin password (use: admin)</p>
+      <input type="password" class="input" id="admin-pass" placeholder="Admin password" value="${state.adminPass}" style="margin-bottom:14px">
+      ${state.error ? `<p class="error">${state.error}</p>` : ''}
+      <button class="btn" id="admin-login">Login as Admin</button>
+    `;
+  }
+  return `<div class="login-wrap"><div class="login-card">${inner}</div><p class="hint">Demo: OTP = 1234 | Admin = admin</p></div>`;
+}
+
+function bindLogin() {
+  const $ = id => document.getElementById(id);
+  $('goto-phone')?.addEventListener('click', () => { state.loginStep = 'phone'; render(); });
+  $('goto-admin')?.addEventListener('click', () => { state.loginStep = 'admin'; state.error = ''; render(); });
+  $('back-select')?.addEventListener('click', () => { state.loginStep = 'select'; render(); });
+  $('back-select2')?.addEventListener('click', () => { state.loginStep = 'select'; render(); });
+  $('back-phone')?.addEventListener('click', () => { state.loginStep = 'phone'; render(); });
+  $('phone-select')?.addEventListener('change', e => { state.phone = e.target.value; render(); });
+  $('send-otp')?.addEventListener('click', () => { if(state.phone) { state.loginStep = 'otp'; state.otp = ['','','','']; state.error = ''; render(); setTimeout(() => $('otp0')?.focus(), 50); }});
+  [0,1,2,3].forEach(i => {
+    $(`otp${i}`)?.addEventListener('input', e => {
+      state.otp[i] = e.target.value.slice(-1);
+      if (e.target.value && i < 3) { render(); setTimeout(() => $(`otp${i+1}`)?.focus(), 10); } else { render(); }
+    });
+  });
+  $('verify-otp')?.addEventListener('click', () => {
+    if (state.otp.join('') === '1234') {
+      const mgr = db.managers.find(m => m.phone === state.phone) || db.managers[0];
+      state.managerId = mgr.id; state.role = 'manager'; state.screen = 'app'; state.tab = 'home'; render();
+    } else { state.error = 'Invalid OTP. Use 1234 for demo.'; render(); }
+  });
+  $('admin-pass')?.addEventListener('input', e => { state.adminPass = e.target.value; });
+  $('admin-login')?.addEventListener('click', () => {
+    if (state.adminPass === 'admin') { state.role = 'admin'; state.screen = 'app'; state.tab = 'dashboard'; render(); }
+    else { state.error = "Invalid password. Use 'admin'."; render(); }
+  });
+}
+
+// ─── MANAGER ───
+function renderManager() {
+  const m = getManager();
+  if (!m) return '';
+  const txs = getMyTx();
+  const notifs = getMyNotifs();
+  const unread = notifs.filter(n => !n.read).length;
+  let content = '';
+
+  if (state.tab === 'home') {
+    const rank = getRank();
+    const recentTx = txs.slice(0, 3).map(tx => `
+      <div class="card-sm"><div class="tx-row">
+        <div class="tx-info"><p>${tx.reason}</p><p>${tx.date}</p></div>
+        <span class="tx-amount ${tx.type==='credit'?'tx-credit':'tx-debit'}">${tx.type==='credit'?'+':'-'}${tx.points}</span>
+      </div></div>
+    `).join('');
+    content = `
+      <div class="points-card">
+        <div class="orb"></div>
+        <p class="points-label">Total Points</p>
+        <p class="points-value">${m.points.toLocaleString()}</p>
+        <p class="points-store">${m.store}</p>
+        <div class="rank-badge">${icon('trophy',12)} Rank #${rank}</div>
+      </div>
+      ${deferredPrompt ? `<div class="install-banner"><div><p><strong>Install Chain Rewards</strong></p><p>Add to home screen for quick access</p></div><button class="btn" onclick="installPWA()">Install</button></div>` : ''}
+      <p class="section-title">Quick actions</p>
+      <div class="quick-grid">
+        <button class="quick-btn" data-tab="rewards"><div class="quick-icon" style="background:rgba(245,158,11,.12);color:#f59e0b">${icon('gift',18)}</div><span class="quick-label">Rewards</span></button>
+        <button class="quick-btn" data-tab="history"><div class="quick-icon" style="background:rgba(59,130,246,.12);color:#3b82f6">${icon('history',18)}</div><span class="quick-label">History</span></button>
+        <button class="quick-btn" data-tab="leaderboard"><div class="quick-icon" style="background:rgba(16,185,129,.12);color:#10b981">${icon('chart',18)}</div><span class="quick-label">Leaderboard</span></button>
+        <button class="quick-btn" data-tab="notifications"><div class="quick-icon" style="background:rgba(139,92,246,.12);color:#8b5cf6">${icon('bell',18)}</div><span class="quick-label">Notifications</span></button>
+      </div>
+      <p class="section-title">Recent activity</p>
+      ${recentTx || '<p style="color:var(--text4);text-align:center;margin-top:20px">No transactions yet</p>'}
+    `;
+  } else if (state.tab === 'rewards') {
+    const cats = ['All','Entertainment','Shopping','Food','Wellness','Merchandise','Travel'];
+    const filtered = state.catFilter === 'All' ? db.rewards : db.rewards.filter(r => r.category === state.catFilter);
+    content = `
+      <h2 class="page-title">Reward catalog</h2>
+      <div class="cats">${cats.map(c => `<button class="cat-pill ${state.catFilter===c?'active':''}" data-cat="${c}">${c}</button>`).join('')}</div>
+      ${filtered.map(rw => {
+        const canRedeem = m.points >= rw.points && rw.stock > 0;
+        return `<div class="card-sm"><div class="reward-row">
+          <div class="reward-icon">${rw.image}</div>
+          <div class="reward-info">
+            <p class="reward-name">${rw.name}</p>
+            <p class="reward-desc">${rw.description}</p>
+            <div class="reward-meta"><span class="pts-badge">${rw.points} pts</span><span class="stock-label" style="color:${rw.stock>5?'#4ade80':'#fb923c'}">${rw.stock} left</span></div>
+          </div>
+          <button class="btn-redeem ${canRedeem?'active':'disabled'}" data-rwid="${rw.id}" ${canRedeem?'':'disabled'}>Redeem</button>
+        </div></div>`;
+      }).join('')}
+    `;
+  } else if (state.tab === 'history') {
+    content = `<h2 class="page-title">Transaction history</h2>` + (txs.length === 0 ? '<p style="color:var(--text4);text-align:center;margin-top:40px">No transactions yet</p>' :
+      txs.map(tx => `<div class="card-sm"><div class="tx-row" style="gap:12px">
+        <div class="tx-dot" style="background:${tx.type==='credit'?'var(--green-bg)':'var(--red-bg)'};color:${tx.type==='credit'?'var(--green)':'var(--red)'}">${tx.type==='credit'?'+':'-'}</div>
+        <div class="tx-info" style="flex:1"><p>${tx.reason}</p><p>${tx.date} · ${tx.by}</p></div>
+        <span class="tx-amount ${tx.type==='credit'?'tx-credit':'tx-debit'}">${tx.type==='credit'?'+':'-'}${tx.points}</span>
+      </div></div>`).join(''));
+  } else if (state.tab === 'leaderboard') {
+    const lb = [...db.managers].sort((a,b) => b.points - a.points).slice(0,10);
+    const rankBgs = ['linear-gradient(135deg,#fbbf24,#f59e0b)','linear-gradient(135deg,#94a3b8,#64748b)','linear-gradient(135deg,#cd7f32,#a0522d)'];
+    content = `<h2 class="page-title">Leaderboard</h2>` +
+      lb.map((mgr,i) => `<div class="card-sm ${mgr.id===m.id?'lb-highlight':''}"><div class="lb-row">
+        <div class="lb-rank" style="background:${i<3?rankBgs[i]:'rgba(255,255,255,.06)'};color:${i<3?'#0f172a':'var(--text4)'}">${i+1}</div>
+        <div class="lb-avatar">${mgr.avatar}</div>
+        <div style="flex:1"><p class="lb-name">${mgr.name}${mgr.id===m.id?'<span class="lb-you">(You)</span>':''}</p><p class="lb-store">${mgr.store}</p></div>
+        <span class="lb-pts">${mgr.points.toLocaleString()}</span>
+      </div></div>`).join('');
+  } else if (state.tab === 'notifications') {
+    content = `<h2 class="page-title">Notifications</h2>` + (notifs.length === 0 ? '<p style="color:var(--text4);text-align:center;margin-top:40px">No notifications</p>' :
+      notifs.map(n => `<div class="card-sm notif-item ${n.read?'':'unread'}"><p class="notif-msg">${n.message}</p><p class="notif-date">${n.date}</p></div>`).join(''));
+  }
+
+  let modal = '';
+  if (state.showConfirm && state.selectedReward) {
+    const rw = state.selectedReward;
+    modal = `<div class="modal-bg" id="modal-bg">
+      <div class="modal-card">
+        <div class="modal-icon">${rw.image}</div>
+        <h3 class="modal-title">${rw.name}</h3>
+        <p class="modal-sub">Redeem for ${rw.points} points?</p>
+        <p class="modal-balance">Balance: ${m.points} pts → ${m.points - rw.points} pts</p>
+        <div class="modal-actions">
+          <button class="modal-cancel" id="modal-cancel">Cancel</button>
+          <button class="modal-confirm" id="modal-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  let toast = state.toast ? `<div class="toast">${icon('check')} ${state.toast}</div>` : '';
+
+  return `<div class="app">
+    ${toast}${modal}
+    <div class="header">
+      <div class="header-left"><p>Welcome back,</p><p>${m.name}</p></div>
+      <div class="header-actions">
+        <button data-tab="notifications" class="notif-btn">${icon('bell',22)}${unread>0?`<span class="notif-badge">${unread}</span>`:''}</button>
+        <button id="logout-btn">${icon('logout')}</button>
+      </div>
+    </div>
+    <div class="content">${content}</div>
+    <div class="nav">
+      ${[{id:'home',ic:'home',l:'Home'},{id:'rewards',ic:'gift',l:'Rewards'},{id:'history',ic:'history',l:'History'},{id:'leaderboard',ic:'chart',l:'Rank'}].map(t =>
+        `<button class="nav-item ${state.tab===t.id?'active':''}" data-tab="${t.id}">${icon(t.ic)}<span>${t.l}</span></button>`
+      ).join('')}
+    </div>
+  </div>`;
+}
+
+function bindManager() {
+  document.querySelectorAll('[data-tab]').forEach(el => {
+    el.addEventListener('click', () => { state.tab = el.dataset.tab; render(); });
+  });
+  document.querySelectorAll('[data-cat]').forEach(el => {
+    el.addEventListener('click', () => { state.catFilter = el.dataset.cat; render(); });
+  });
+  document.querySelectorAll('[data-rwid]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.selectedReward = db.rewards.find(r => r.id === el.dataset.rwid);
+      state.showConfirm = true; render();
+    });
+  });
+  document.getElementById('modal-cancel')?.addEventListener('click', () => { state.showConfirm = false; state.selectedReward = null; render(); });
+  document.getElementById('modal-bg')?.addEventListener('click', e => { if(e.target.id==='modal-bg'){state.showConfirm=false;state.selectedReward=null;render();} });
+  document.getElementById('modal-confirm')?.addEventListener('click', () => {
+    const rw = state.selectedReward;
+    const m = getManager();
+    if (!rw || !m || m.points < rw.points || rw.stock <= 0) return;
+    // Deduct points
+    db.managers = db.managers.map(mg => mg.id === m.id ? {...mg, points: mg.points - rw.points} : mg);
+    // Reduce stock
+    db.rewards = db.rewards.map(r => r.id === rw.id ? {...r, stock: r.stock - 1} : r);
+    // Add transaction
+    db.transactions.unshift({id:'TX'+uid(), managerId:m.id, type:'debit', points:rw.points, reason:`Redeemed: ${rw.name}`, date:today(), by:'System'});
+    // Add redemption
+    db.redemptions.unshift({id:'RD'+uid(), managerId:m.id, rewardId:rw.id, rewardName:rw.name, points:rw.points, status:'pending', date:today()});
+    // Add notification
+    db.notifications.unshift({id:'N'+uid(), managerId:m.id, message:`Redemption request for ${rw.name} submitted!`, date:today(), read:false});
+    saveDB(db);
+    state.showConfirm = false; state.selectedReward = null;
+    showToast('Redemption request submitted!');
+  });
+  document.getElementById('logout-btn')?.addEventListener('click', () => { state.screen='login'; state.loginStep='select'; state.role=null; state.managerId=null; state.error=''; state.adminPass=''; render(); });
+}
+
+// ─── ADMIN ───
+function renderAdmin() {
+  const pending = db.redemptions.filter(r => r.status === 'pending');
+  const totalPts = db.managers.reduce((s,m) => s + m.points, 0);
+  let content = '';
+
+  if (state.tab === 'dashboard') {
+    const topPerf = [...db.managers].sort((a,b) => b.points - a.points).slice(0,5);
+    content = `
+      <h1 style="font-size:22px;font-weight:700;margin-bottom:20px">Dashboard</h1>
+      <div class="stat-grid">
+        <div class="stat-card" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)"><p class="stat-label">Total managers</p><p class="stat-val" style="color:#3b82f6">${db.managers.length}</p></div>
+        <div class="stat-card" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)"><p class="stat-label">Total points</p><p class="stat-val" style="color:#fbbf24">${totalPts.toLocaleString()}</p></div>
+        <div class="stat-card" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2)"><p class="stat-label">Redemptions</p><p class="stat-val" style="color:#10b981">${db.redemptions.length}</p></div>
+        <div class="stat-card" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)"><p class="stat-label">Pending</p><p class="stat-val" style="color:#ef4444">${pending.length}</p></div>
+      </div>
+      <div class="card"><h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Top performers</h3>
+        ${topPerf.map((m,i) => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i<4?'border-bottom:1px solid rgba(255,255,255,.04)':''}">
+          <span style="width:22px;font-size:13px;font-weight:600;color:${i<3?'#fbbf24':'var(--text4)'}">#${i+1}</span>
+          <div class="lb-avatar" style="width:30px;height:30px;font-size:11px">${m.avatar}</div>
+          <div style="flex:1"><p style="font-size:13px;font-weight:500">${m.name}</p><p style="font-size:11px;color:var(--text4)">${m.store}</p></div>
+          <span style="font-size:14px;font-weight:700;color:#fbbf24">${m.points.toLocaleString()}</span>
+        </div>`).join('')}
+      </div>
+      ${pending.length > 0 ? `<div class="card"><h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Pending approvals</h3>
+        ${pending.slice(0,5).map(rd => {const mg=db.managers.find(m=>m.id===rd.managerId);return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="flex:1"><p style="font-size:13px;font-weight:500">${mg?.name||'?'}</p><p style="font-size:11px;color:var(--text4)">${rd.rewardName} · ${rd.points} pts</p></div>
+          <button class="btn-sm" style="background:var(--green-bg);color:var(--green)" data-approve="${rd.id}">${icon('check')}</button>
+          <button class="btn-sm" style="background:var(--red-bg);color:var(--red)" data-reject="${rd.id}">${icon('x')}</button>
+        </div>`;}).join('')}
+      </div>` : ''}
+    `;
+  } else if (state.tab === 'managers') {
+    const filtered = db.managers.filter(m => m.name.toLowerCase().includes(state.searchQ.toLowerCase()) || m.store.toLowerCase().includes(state.searchQ.toLowerCase()));
+    content = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <h1 style="font-size:22px;font-weight:700">Managers</h1>
+        <button class="btn" id="add-manager-btn" style="width:auto;padding:8px 16px;font-size:13px">${icon('plus')} Add Manager</button>
+      </div>
+      <input class="input" placeholder="Search managers..." value="${state.searchQ}" id="search-mgr" style="margin-bottom:14px">
+      <div class="card" style="overflow-x:auto">
+        <table><thead><tr><th>Manager</th><th>Store</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+          ${filtered.map(m => `<tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="lb-avatar" style="width:28px;height:28px;font-size:10px">${m.avatar}</div><div><p style="font-weight:500">${m.name}</p><p style="font-size:11px;color:var(--text4)">${m.phone}</p></div></div></td>
+            <td>${m.store}</td>
+            <td style="font-weight:700;color:#fbbf24">${m.points.toLocaleString()}</td>
+            <td><span class="status-badge" style="background:var(--green-bg);color:var(--green)">${m.status}</span></td>
+            <td><button class="btn-sm" style="background:rgba(245,158,11,.12);color:#fbbf24" data-addpts="${m.id}">${icon('coins')} Points</button></td>
+          </tr>`).join('')}
+        </tbody></table>
+      </div>
+    `;
+  } else if (state.tab === 'rewards') {
+    content = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <h1 style="font-size:22px;font-weight:700">Reward Catalog</h1>
+        <button class="btn" id="add-reward-btn" style="width:auto;padding:8px 16px;font-size:13px">${icon('plus')} Add Reward</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+        ${db.rewards.map(rw => `<div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div class="reward-icon" style="width:44px;height:44px;font-size:22px">${rw.image}</div>
+            <div><p style="font-size:14px;font-weight:600">${rw.name}</p><p style="font-size:11px;color:var(--text4)">${rw.category}</p></div>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-bottom:10px">${rw.description}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:17px;font-weight:700;color:#fbbf24">${rw.points} pts</span>
+            <span style="font-size:12px;color:${rw.stock>5?'#4ade80':'#fb923c'}">Stock: ${rw.stock}</span>
+          </div>
+        </div>`).join('')}
+      </div>
+    `;
+  } else if (state.tab === 'redemptions') {
+    content = `
+      <h1 style="font-size:22px;font-weight:700;margin-bottom:16px">Redemptions</h1>
+      <div class="card" style="overflow-x:auto">
+        <table><thead><tr><th>Manager</th><th>Reward</th><th>Points</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+          ${db.redemptions.map(rd => {const mg=db.managers.find(m=>m.id===rd.managerId);return `<tr>
+            <td>${mg?.name||'?'}</td><td>${rd.rewardName}</td><td style="font-weight:600">${rd.points}</td><td style="color:var(--text3)">${rd.date}</td>
+            <td><span class="status-badge" style="background:${rd.status==='approved'?'var(--green-bg)':rd.status==='pending'?'rgba(245,158,11,.15)':'var(--red-bg)'};color:${rd.status==='approved'?'var(--green)':rd.status==='pending'?'#fbbf24':'var(--red)'}">${rd.status}</span></td>
+            <td>${rd.status==='pending'?`<button class="btn-sm" style="background:var(--green-bg);color:var(--green);margin-right:4px" data-approve="${rd.id}">Approve</button><button class="btn-sm" style="background:var(--red-bg);color:var(--red)" data-reject="${rd.id}">Reject</button>`:''}</td>
+          </tr>`;}).join('')}
+        </tbody></table>
+      </div>
+    `;
+  } else if (state.tab === 'reports') {
+    const maxPts = Math.max(...db.managers.map(m => m.points), 1);
+    const catCounts = {};
+    db.redemptions.forEach(rd => { const rw = db.rewards.find(r=>r.id===rd.rewardId); const c = rw?.category||'Other'; catCounts[c]=(catCounts[c]||0)+1; });
+    const maxCat = Math.max(...Object.values(catCounts), 1);
+    const catColors = {Entertainment:'#8b5cf6',Shopping:'#3b82f6',Food:'#f59e0b',Wellness:'#10b981',Merchandise:'#f43f5e',Travel:'#06b6d4',Other:'#64748b'};
+    content = `
+      <h1 style="font-size:22px;font-weight:700;margin-bottom:16px">Reports</h1>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:16px">
+        <div class="card"><h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Points distribution</h3>
+          <div class="bar-chart">${[...db.managers].sort((a,b)=>b.points-a.points).map(m => `<div><label><span>${m.name}</span><span style="color:#fbbf24;font-weight:600">${m.points.toLocaleString()}</span></label><div class="bar-track"><div class="bar-fill" style="width:${(m.points/maxPts)*100}%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div></div>`).join('')}</div>
+        </div>
+        <div class="card"><h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Redemptions by category</h3>
+          <div class="bar-chart">${Object.entries(catCounts).map(([c,n]) => `<div><label><span>${c}</span><span style="font-weight:600">${n}</span></label><div class="bar-track"><div class="bar-fill" style="width:${(n/maxCat)*100}%;background:${catColors[c]||'#64748b'}"></div></div></div>`).join('')}</div>
+        </div>
+      </div>
+      <div class="card"><h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Recent transactions</h3>
+        <div style="overflow-x:auto"><table><thead><tr><th>Manager</th><th>Type</th><th>Points</th><th>Reason</th><th>Date</th></tr></thead><tbody>
+          ${db.transactions.slice(0,10).map(tx => {const mg=db.managers.find(m=>m.id===tx.managerId);return `<tr>
+            <td>${mg?.name||'?'}</td><td style="color:${tx.type==='credit'?'var(--green)':'var(--red)'};font-weight:500">${tx.type}</td><td style="font-weight:600">${tx.points}</td><td style="color:var(--text2)">${tx.reason}</td><td style="color:var(--text3)">${tx.date}</td>
+          </tr>`;}).join('')}
+        </tbody></table></div>
+      </div>
+    `;
+  }
+
+  // Modals
+  let modals = '';
+  if (state.showAddPoints) {
+    const mg = db.managers.find(m => m.id === state.showAddPoints);
+    modals += `<div class="admin-modal" id="pts-modal-bg"><div class="admin-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3>Add/Deduct Points</h3><button style="background:none;border:none;color:var(--text3);cursor:pointer" id="close-pts">${icon('x')}</button></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Manager: ${mg?.name}</p>
+      <input type="number" class="input" placeholder="Points (negative to deduct)" id="pts-amount" value="${state.pointsAmt}">
+      <input class="input" placeholder="Reason" id="pts-reason" value="${state.pointsReason}">
+      <button class="btn" id="submit-pts" style="margin-top:6px">Submit</button>
+    </div></div>`;
+  }
+  if (state.showAddReward) {
+    const emojis = ['🎁','🎬','🛒','🍔','💆','🎭','👕','✈️','🏷️','☕'];
+    modals += `<div class="admin-modal" id="rw-modal-bg"><div class="admin-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3>Add new reward</h3><button style="background:none;border:none;color:var(--text3);cursor:pointer" id="close-rw">${icon('x')}</button></div>
+      <input class="input" placeholder="Reward name" id="rw-name" value="${state.newReward.name}">
+      <select class="input" id="rw-cat">${['Shopping','Entertainment','Food','Wellness','Merchandise','Travel'].map(c=>`<option ${state.newReward.category===c?'selected':''}>${c}</option>`).join('')}</select>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <input type="number" class="input" placeholder="Points required" id="rw-pts" value="${state.newReward.points}">
+        <input type="number" class="input" placeholder="Stock" id="rw-stock" value="${state.newReward.stock}">
+      </div>
+      <input class="input" placeholder="Description" id="rw-desc" value="${state.newReward.description}">
+      <p style="font-size:12px;color:var(--text3);margin:6px 0">Select icon</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${emojis.map(e=>`<button style="width:36px;height:36px;border-radius:8px;border:${state.newReward.image===e?'2px solid #fbbf24':'1px solid var(--border2)'};background:var(--card);font-size:18px;cursor:pointer" data-emoji="${e}">${e}</button>`).join('')}</div>
+      <button class="btn" id="submit-rw">Add Reward</button>
+    </div></div>`;
+  }
+  if (state.showAddManager) {
+    modals += `<div class="admin-modal" id="mgr-modal-bg"><div class="admin-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3>Add new manager</h3><button style="background:none;border:none;color:var(--text3);cursor:pointer" id="close-mgr">${icon('x')}</button></div>
+      <input class="input" placeholder="Full name" id="mgr-name" value="${state.newManager.name}">
+      <input class="input" placeholder="Phone number" id="mgr-phone" value="${state.newManager.phone}">
+      <input class="input" placeholder="Store/Branch name" id="mgr-store" value="${state.newManager.store}">
+      <button class="btn" id="submit-mgr" style="margin-top:6px">Add Manager</button>
+    </div></div>`;
+  }
+
+  let toast = state.toast ? `<div class="toast">${icon('check')} ${state.toast}</div>` : '';
+
+  // Nav tabs
+  const tabs = [{id:'dashboard',ic:'home',l:'Dashboard'},{id:'managers',ic:'users',l:'Managers'},{id:'rewards',ic:'gift',l:'Rewards'},{id:'redemptions',ic:'check',l:'Approvals'},{id:'reports',ic:'chart',l:'Reports'}];
+  const sideNav = tabs.map(t => `<button class="admin-nav-btn ${state.tab===t.id?'active':''}" data-tab="${t.id}">${icon(t.ic,18)} ${t.l}${t.id==='redemptions'&&pending.length?`<span class="pending-dot">${pending.length}</span>`:''}</button>`).join('');
+
+  return `${toast}${modals}
+    <div class="admin-shell" style="min-height:100vh;background:var(--bg)">
+      <div class="admin-sidebar">
+        <div style="padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:34px;height:34px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:9px;display:flex;align-items:center;justify-content:center">${icon('trophy',16)}</div>
+            <div><p style="font-size:14px;font-weight:700">Chain Rewards</p><p style="font-size:10px;color:var(--text4)">Admin Panel</p></div>
+          </div>
+        </div>
+        ${sideNav}
+        <div style="margin-top:auto;padding:14px 20px;border-top:1px solid var(--border)">
+          <button class="admin-nav-btn" id="admin-logout" style="color:var(--red);padding-left:0">${icon('logout',18)} Logout</button>
+        </div>
+      </div>
+      <div class="admin-main">${content}</div>
+      <div class="admin-nav-mobile" style="display:none">
+        ${tabs.slice(0,5).map(t => `<button class="nav-item ${state.tab===t.id?'active':''}" data-tab="${t.id}">${icon(t.ic)}<span style="font-size:9px">${t.l}</span></button>`).join('')}
+      </div>
+    </div>
+    <style>@media(max-width:767px){.admin-nav-mobile{display:flex!important}.admin-main{padding-bottom:80px!important}}</style>
+  `;
+}
+
+function bindAdmin() {
+  document.querySelectorAll('[data-tab]').forEach(el => { el.addEventListener('click', () => { state.tab = el.dataset.tab; render(); }); });
+  document.querySelectorAll('[data-approve]').forEach(el => {
+    el.addEventListener('click', () => {
+      db.redemptions = db.redemptions.map(r => r.id === el.dataset.approve ? {...r, status:'approved'} : r);
+      saveDB(db); showToast('Redemption approved!');
+    });
+  });
+  document.querySelectorAll('[data-reject]').forEach(el => {
+    el.addEventListener('click', () => {
+      const rd = db.redemptions.find(r => r.id === el.dataset.reject);
+      if (rd) {
+        db.redemptions = db.redemptions.map(r => r.id === rd.id ? {...r, status:'rejected'} : r);
+        db.managers = db.managers.map(m => m.id === rd.managerId ? {...m, points: m.points + rd.points} : m);
+        db.rewards = db.rewards.map(r => r.id === rd.rewardId ? {...r, stock: r.stock + 1} : r);
+        saveDB(db); showToast('Redemption rejected, points refunded');
+      }
+    });
+  });
+  document.querySelectorAll('[data-addpts]').forEach(el => { el.addEventListener('click', () => { state.showAddPoints = el.dataset.addpts; state.pointsAmt=''; state.pointsReason=''; render(); }); });
+  document.getElementById('close-pts')?.addEventListener('click', () => { state.showAddPoints = null; render(); });
+  document.getElementById('pts-modal-bg')?.addEventListener('click', e => { if(e.target.id==='pts-modal-bg'){state.showAddPoints=null;render();} });
+  document.getElementById('pts-amount')?.addEventListener('input', e => { state.pointsAmt = e.target.value; });
+  document.getElementById('pts-reason')?.addEventListener('input', e => { state.pointsReason = e.target.value; });
+  document.getElementById('submit-pts')?.addEventListener('click', () => {
+    const amt = parseInt(state.pointsAmt);
+    if (!amt || !state.pointsReason) return;
+    db.managers = db.managers.map(m => m.id === state.showAddPoints ? {...m, points: m.points + amt} : m);
+    db.transactions.unshift({id:'TX'+uid(), managerId:state.showAddPoints, type:amt>0?'credit':'debit', points:Math.abs(amt), reason:state.pointsReason, date:today(), by:'Admin'});
+    db.notifications.unshift({id:'N'+uid(), managerId:state.showAddPoints, message:`${amt>0?'Earned':'Deducted'} ${Math.abs(amt)} points: ${state.pointsReason}`, date:today(), read:false});
+    saveDB(db); state.showAddPoints = null; showToast('Points updated!');
+  });
+  document.getElementById('add-reward-btn')?.addEventListener('click', () => { state.showAddReward = true; state.newReward = {name:'',category:'Shopping',points:'',stock:'',description:'',image:'🎁'}; render(); });
+  document.getElementById('close-rw')?.addEventListener('click', () => { state.showAddReward = false; render(); });
+  document.getElementById('rw-modal-bg')?.addEventListener('click', e => { if(e.target.id==='rw-modal-bg'){state.showAddReward=false;render();} });
+  document.getElementById('rw-name')?.addEventListener('input', e => { state.newReward.name = e.target.value; });
+  document.getElementById('rw-cat')?.addEventListener('change', e => { state.newReward.category = e.target.value; });
+  document.getElementById('rw-pts')?.addEventListener('input', e => { state.newReward.points = e.target.value; });
+  document.getElementById('rw-stock')?.addEventListener('input', e => { state.newReward.stock = e.target.value; });
+  document.getElementById('rw-desc')?.addEventListener('input', e => { state.newReward.description = e.target.value; });
+  document.querySelectorAll('[data-emoji]').forEach(el => { el.addEventListener('click', () => { state.newReward.image = el.dataset.emoji; render(); }); });
+  document.getElementById('submit-rw')?.addEventListener('click', () => {
+    if (!state.newReward.name || !state.newReward.points || !state.newReward.stock) return;
+    db.rewards.push({id:'RW'+uid(), ...state.newReward, points:parseInt(state.newReward.points), stock:parseInt(state.newReward.stock)});
+    saveDB(db); state.showAddReward = false; showToast('Reward added!');
+  });
+  document.getElementById('add-manager-btn')?.addEventListener('click', () => { state.showAddManager = true; state.newManager = {name:'',phone:'',store:''}; render(); });
+  document.getElementById('close-mgr')?.addEventListener('click', () => { state.showAddManager = false; render(); });
+  document.getElementById('mgr-modal-bg')?.addEventListener('click', e => { if(e.target.id==='mgr-modal-bg'){state.showAddManager=false;render();} });
+  document.getElementById('mgr-name')?.addEventListener('input', e => { state.newManager.name = e.target.value; });
+  document.getElementById('mgr-phone')?.addEventListener('input', e => { state.newManager.phone = e.target.value; });
+  document.getElementById('mgr-store')?.addEventListener('input', e => { state.newManager.store = e.target.value; });
+  document.getElementById('submit-mgr')?.addEventListener('click', () => {
+    if (!state.newManager.name || !state.newManager.phone || !state.newManager.store) return;
+    db.managers.push({id:'MGR'+uid(), ...state.newManager, points:0, status:'active', joinDate:today(), avatar:state.newManager.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()});
+    saveDB(db); state.showAddManager = false; showToast('Manager added!');
+  });
+  document.getElementById('search-mgr')?.addEventListener('input', e => { state.searchQ = e.target.value; render(); });
+  document.getElementById('admin-logout')?.addEventListener('click', () => { state.screen='login'; state.loginStep='select'; state.role=null; state.error=''; state.adminPass=''; render(); });
+}
+
+// ─── Boot ───
+setTimeout(() => { state.screen = 'login'; render(); }, 800);
+
+// ─── Service Worker ───
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
