@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#22223B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Retail Chain Rewards Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+/* ═══ THEME VARIABLES ═══ */
+:root{
+  --navy:#22223B;--dgray:#4A4E69;--pgray:#6E6A8E;--orange:#D28C55;--lblue:#9FA8DA;--yellow:#D4D86E;
+  /* Light mode */
+  --bg:#F5F4F0;--bg2:#FFFFFF;--bg3:#EDE9E3;--sf:rgba(34,34,59,.03);
+  --bd:rgba(34,34,59,.08);--bd2:rgba(34,34,59,.14);
+  --tx:#22223B;--t2:#6E6A8E;--t3:#9E9BB5;
+  --card-shadow:0 2px 12px rgba(34,34,59,.06);
+  --f:'Nunito',system-ui,sans-serif;--m:'IBM Plex Mono',monospace;
+}
+[data-theme="dark"]{
+  --bg:#16162A;--bg2:#1E1E36;--bg3:#282845;--sf:rgba(255,255,255,.03);
+  --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.1);
+  --tx:#E8E6F0;--t2:#9E9BB5;--t3:#5A577A;
+  --card-shadow:0 2px 16px rgba(0,0,0,.25);
+}
+
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--f);overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+input,select,button,textarea{font-family:inherit;outline:none}
+::-webkit-scrollbar{width:0;height:0}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;position:relative}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes su{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes sd{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* ═══ SHARED COMPONENTS ═══ */
+.inp{width:100%;padding:13px 16px;background:var(--bg);border:1.5px solid var(--bd2);border-radius:12px;color:var(--tx);font-size:14px;transition:border .2s,box-shadow .2s}
+.inp:focus{border-color:var(--lblue);box-shadow:0 0 0 3px rgba(159,168,218,.15)}
+.inp::placeholder{color:var(--t3)}
+select.inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%236E6A8E'%3E%3Cpath d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select.inp option{background:var(--bg2);color:var(--tx)}
+.btn-p{width:100%;padding:14px;background:linear-gradient(135deg,var(--orange),#c07840);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s;letter-spacing:.01em}
+.btn-p:active{transform:scale(.97)}
+.btn-p:disabled{opacity:.4;pointer-events:none}
+.btn-s{width:100%;padding:13px;background:transparent;border:1.5px solid var(--bd2);border-radius:12px;color:var(--t2);font-size:14px;cursor:pointer}
+.btn-bk{background:0;border:0;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:13px;padding:0;margin-bottom:16px}
+.err{color:#E74C3C;font-size:12px;margin-top:6px}
+
+/* ═══ LOGIN / REGISTER ═══ */
+.auth-bg{min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,var(--navy) 0%,var(--bg) 70%);position:relative;overflow:hidden}
+.auth-bg .orb1{position:absolute;width:240px;height:240px;border-radius:50%;filter:blur(80px);opacity:.2;background:var(--yellow);top:-40px;right:-60px}
+.auth-bg .orb2{position:absolute;width:180px;height:180px;border-radius:50%;filter:blur(70px);opacity:.15;background:var(--lblue);bottom:30%;left:-60px}
+.auth-hd{padding:48px 24px 0;position:relative;z-index:1}
+.auth-hd .logo{width:56px;height:56px;background:linear-gradient(135deg,var(--yellow),var(--orange));border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 28px rgba(212,216,110,.2);animation:float 2.5s ease-in-out infinite}
+.auth-hd h1{font-size:28px;font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:6px;color:#fff}
+.auth-hd h1 em{font-style:normal;color:var(--yellow)}
+.auth-hd p{color:var(--lblue);font-size:14px}
+.auth-card{position:relative;z-index:1;background:var(--bg2);border-top:1px solid var(--bd2);border-radius:28px 28px 0 0;padding:30px 24px 36px;margin-top:32px;box-shadow:var(--card-shadow)}
+.otp-r{display:flex;gap:10px;justify-content:center;margin:18px 0 22px}
+.otp-b{width:54px;height:60px;text-align:center;font-size:24px;font-weight:700;font-family:var(--m);background:var(--bg);border:1.5px solid var(--bd2);border-radius:14px;color:var(--tx);transition:border .2s}
+.otp-b:focus{border-color:var(--orange)}
+.hint{color:var(--t3);font-size:11px;text-align:center;margin-top:14px;font-family:var(--m)}
+.tabs-auth{display:flex;gap:0;margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid var(--bd2)}
+.tab-a{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--t2);border:none;transition:all .15s}
+.tab-a.on{background:var(--orange);color:#fff}
+
+/* ═══ HEADER ═══ */
+.m-hdr{padding:14px 18px 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--bg) 60%,transparent)}
+.m-hdr .greet{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.m-hdr .name{font-size:17px;font-weight:800;color:var(--tx)}
+.hdr-acts{display:flex;gap:6px}
+.hdr-btn{width:38px;height:38px;border-radius:11px;background:var(--bg2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);position:relative;box-shadow:var(--card-shadow);transition:background .2s}
+.hdr-btn:active{background:var(--bg3)}
+.hdr-btn .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:#E74C3C;border-radius:50%;border:2px solid var(--bg)}
+.content{padding:0 18px 108px;overflow-y:auto}
+
+/* ═══ HERO CARD ═══ */
+.hero{border-radius:20px;padding:22px 20px;margin:10px 0 16px;position:relative;overflow:hidden;background:linear-gradient(145deg,var(--navy),var(--dgray));box-shadow:0 8px 32px rgba(34,34,59,.2);animation:su .4s ease}
+.hero::before{content:'';position:absolute;top:-30%;right:-20%;width:160px;height:160px;background:radial-gradient(circle,rgba(212,216,110,.15),transparent 70%)}
+.hero .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--yellow);font-family:var(--m);margin-bottom:6px}
+.hero .val{font-size:42px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em}
+.hero .sub{font-size:12px;color:var(--lblue);margin:3px 0 12px}
+.hero .badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:16px;font-size:10px;font-weight:600}
+
+/* ═══ MODEL TARGET CARDS ═══ */
+.model-sec{margin-bottom:16px}
+.model-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.model-hdr h3{font-size:14px;font-weight:700}
+.model-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:9px;box-shadow:var(--card-shadow);transition:transform .12s}
+.model-card:active{transform:scale(.99)}
+.model-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.model-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.model-name .icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.model-pct{font-size:20px;font-weight:800;font-family:var(--m)}
+.model-bar{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;margin-bottom:8px}
+.model-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.model-stats{display:flex;gap:16px;font-size:11px;color:var(--t2)}
+.model-stats span{display:flex;align-items:center;gap:4px}
+.model-stats .num{font-weight:700;font-family:var(--m);color:var(--tx)}
+
+/* ═══ QUICK ACTIONS ═══ */
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.qa-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 0;border-radius:14px;background:var(--bg2);border:1px solid var(--bd);cursor:pointer;box-shadow:var(--card-shadow);transition:transform .1s}
+.qa-btn:active{transform:scale(.95)}
+.qa-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.qa-lb{font-size:10px;color:var(--t2);font-weight:600}
+
+/* ═══ BRAND GRID ═══ */
+.b-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
+.b-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:var(--card-shadow);transition:transform .12s}
+.b-card:active{transform:scale(.97)}
+.b-img{height:84px;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative}
+.b-img .tag{position:absolute;top:6px;right:6px;padding:2px 7px;border-radius:6px;font-size:8px;font-weight:700;text-transform:uppercase}
+.b-inf{padding:10px 12px}
+.b-inf p:first-child{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-inf .row{display:flex;justify-content:space-between;font-size:11px;margin-top:4px}
+
+/* ═══ CATEGORY CHIPS ═══ */
+.chips{display:flex;gap:7px;overflow-x:auto;padding:0 0 6px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg2);color:var(--t2);font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s}
+.chip.on{background:var(--orange);border-color:var(--orange);color:#fff}
+
+/* ═══ SHEET ═══ */
+.sh-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;animation:fadeIn .15s;backdrop-filter:blur(3px)}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-radius:22px 22px 0 0;z-index:201;animation:su .3s cubic-bezier(.16,1,.3,1);max-height:86vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2);padding-bottom:env(safe-area-inset-bottom)}
+.sh-bar{width:36px;height:4px;border-radius:2px;background:var(--t3);margin:10px auto 0}
+.sh-hero{padding:18px 22px;display:flex;align-items:center;gap:14px}
+.sh-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}
+.sh-name{font-size:18px;font-weight:800}
+.sh-cat{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.sh-body{padding:0 22px 22px}
+.sh-desc{font-size:13px;color:var(--t2);line-height:1.5;padding:14px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;margin-bottom:14px}
+.sh-g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.sh-gd{background:var(--bg);border:1px solid var(--bd);border-radius:11px;padding:12px;text-align:center}
+.sh-gd .v{font-size:16px;font-weight:700;font-family:var(--m);margin-bottom:1px}
+.sh-gd .l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.dm-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.dm-btn{padding:9px 16px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg);color:var(--tx);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--m);transition:all .12s}
+.dm-btn.on{background:rgba(212,140,85,.12);border-color:var(--orange);color:var(--orange)}
+.sh-sub{font-size:11px;color:var(--t3);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.sh-btn{width:100%;padding:15px;border-radius:13px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+.sh-btn:active{transform:scale(.97)}
+
+/* ═══ IMEI SECTION ═══ */
+.imei-box{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--card-shadow)}
+.imei-box h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.imei-row{display:flex;gap:8px;margin-bottom:8px}
+.imei-row input{flex:1}
+.imei-row button{padding:0 14px;border-radius:10px;border:none;background:rgba(212,140,85,.12);color:var(--orange);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.imei-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;margin-bottom:5px;font-family:var(--m);font-size:11px}
+.imei-item .pill{font-size:9px;font-weight:700;padding:2px 8px;border-radius:6px}
+.upload-zone{border:2px dashed var(--bd2);border-radius:14px;padding:22px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.upload-zone:hover{border-color:var(--orange);background:rgba(212,140,85,.03)}
+.upload-zone p{color:var(--t3);font-size:13px;margin-top:6px}
+
+/* ═══ TX ROW ═══ */
+.tx{background:var(--bg2);border:1px solid var(--bd);border-radius:13px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;gap:11px;box-shadow:var(--card-shadow)}
+.tx-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-rs{font-size:12px;font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-mt{font-size:10px;color:var(--t3)}
+.tx-am{font-size:14px;font-weight:700;font-family:var(--m)}
+
+/* ═══ LEADERBOARD ═══ */
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:16px 0 18px}
+.pod-c{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pod-av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;position:relative}
+.pod-av .cr{position:absolute;top:-11px;font-size:14px}
+.pod-nm{font-size:10px;font-weight:600;text-align:center;max-width:66px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod-pt{font-size:11px;font-weight:700;font-family:var(--m);color:var(--orange)}
+.pod-pd{border-radius:8px 8px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font-size:18px;font-weight:900;color:rgba(255,255,255,.1)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border:1px solid var(--bd);border-radius:13px;margin-bottom:7px;box-shadow:var(--card-shadow)}
+.lb-row.me{border-color:rgba(212,140,85,.25);background:rgba(212,140,85,.03)}
+.lb-rk{width:26px;font-size:13px;font-weight:700;font-family:var(--m);color:var(--t3);text-align:center}
+.lb-av{width:32px;height:32px;border-radius:9px;background:rgba(212,140,85,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--orange);flex-shrink:0}
+
+/* ═══ PROFILE ═══ */
+.prof-card{background:var(--bg2);border:1px solid var(--bd);border-radius:18px;padding:22px;margin:14px 0;text-align:center;box-shadow:var(--card-shadow)}
+.prof-av{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--yellow),var(--orange));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--navy);margin:0 auto 10px;box-shadow:0 6px 20px rgba(212,140,85,.2)}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.prof-s{text-align:center}
+.prof-s .v{font-size:18px;font-weight:700;font-family:var(--m)}
+.prof-s .l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:1px}
+.prof-acts{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.prof-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border:1px solid var(--bd);border-radius:13px;cursor:pointer;color:var(--tx)}
+.prof-row span{flex:1;font-size:13px;font-weight:600}
+
+/* ═══ REWARD CARDS ═══ */
+.rw-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
+.rw-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:14px;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.rw-card .rw-icon{font-size:28px;margin-bottom:6px}
+.rw-card .rw-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.rw-card .rw-pts{font-size:12px;font-weight:600;font-family:var(--m);color:var(--orange)}
+.rw-card .rw-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:6px}
+
+/* ═══ BOTTOM NAV ═══ */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--bd);display:flex;padding:4px 6px max(8px,env(safe-area-inset-bottom));backdrop-filter:blur(20px);z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.bn-it{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0;border-radius:10px;background:0;border:0;cursor:pointer;transition:color .12s}
+.bn-it .bn-lb{font-size:9px;font-weight:600}
+.bn-it.on{color:var(--orange)}
+.bn-it:not(.on){color:var(--t3)}
+.bn-dot{width:4px;height:4px;border-radius:50%;background:var(--orange);position:absolute;top:3px;display:none}
+.bn-it.on .bn-dot{display:block}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);padding:11px 18px;border-radius:13px;z-index:400;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;box-shadow:0 8px 32px rgba(0,0,0,.2);animation:sd .3s cubic-bezier(.16,1,.3,1);max-width:88%}
+.toast-ok{background:rgba(6,95,70,.92);color:#a7f3d0;border:1px solid rgba(46,232,157,.15)}
+.toast-er{background:rgba(127,29,29,.92);color:#fca5a5;border:1px solid rgba(255,77,90,.15)}
+
+/* ═══ SECTION ═══ */
+.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sec-h .t{font-size:14px;font-weight:800}
+.sec-h .lk{font-size:11px;color:var(--orange);font-weight:700;cursor:pointer;background:0;border:0}
+.pg-t{font-size:20px;font-weight:800;margin:16px 0 14px;letter-spacing:-.02em}
+.sr-w{position:relative;margin-bottom:12px}
+.sr-w svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3)}
+.sr-w input{padding-left:38px}
+
+/* ═══ THEME TOGGLE ═══ */
+.theme-tog{width:44px;height:24px;border-radius:12px;background:var(--bd2);position:relative;cursor:pointer;border:none;transition:background .2s}
+.theme-tog::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--bg2);transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+[data-theme="dark"] .theme-tog{background:var(--orange)}
+[data-theme="dark"] .theme-tog::after{transform:translateX(20px)}
+
+/* ═══ ADMIN ═══ */
+.a-wrap{display:flex;min-height:100vh;max-width:1200px;margin:0 auto;background:var(--bg)}
+.a-side{width:220px;background:var(--bg2);border-right:1px solid var(--bd);padding:22px 0;position:fixed;height:100vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:2px 0 16px rgba(0,0,0,.04)}
+.a-side .logo{padding:0 18px 20px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--bd);margin-bottom:6px}
+.a-side .logo .mk{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--yellow),var(--orange));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.a-btn{width:100%;padding:10px 18px;background:0;border:0;border-left:3px solid transparent;color:var(--t3);font-size:13px;font-weight:600;cursor:pointer;text-align:left;display:flex;align-items:center;gap:9px;transition:all .12s}
+.a-btn.on{background:rgba(212,140,85,.08);border-left-color:var(--orange);color:var(--orange)}
+.a-btn:hover:not(.on){background:var(--sf)}
+.a-body{flex:1;margin-left:220px;padding:22px 28px;overflow-y:auto;min-height:100vh}
+@media(max-width:767px){.a-side{display:none}.a-body{margin-left:0;padding:14px 18px 100px}.a-mnav{position:fixed;bottom:0;left:0;width:100%;background:var(--bg2);border-top:1px solid var(--bd);display:flex;padding:4px 0 max(8px,env(safe-area-inset-bottom));z-index:100}.s-grid{grid-template-columns:repeat(2,1fr)!important}}
+@media(min-width:768px){.a-mnav{display:none!important}}
+.s-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:20px}
+.s-card{border-radius:15px;padding:18px;border:1px solid var(--bd);box-shadow:var(--card-shadow);position:relative;overflow:hidden;background:var(--bg2)}
+.s-card .sl{font-size:10px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.s-card .sv{font-size:26px;font-weight:800;font-family:var(--m);letter-spacing:-.02em}
+.s-card .sd{font-size:10px;margin-top:3px;font-weight:600;color:var(--t3)}
+.c-panel{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:var(--card-shadow)}
+.c-panel h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 11px;font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;text-align:left;border-bottom:1px solid var(--bd)}
+td{padding:10px 11px;font-size:12px;border-bottom:1px solid var(--bd)}
+tr:hover td{background:rgba(0,0,0,.02)}
+[data-theme="dark"] tr:hover td{background:rgba(255,255,255,.02)}
+.pill{padding:3px 9px;border-radius:7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;display:inline-block}
+.btn-x{padding:5px 11px;border-radius:7px;border:none;font-size:11px;cursor:pointer;font-weight:600;transition:transform .1s}
+.btn-x:active{transform:scale(.95)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;animation:fadeIn .15s;backdrop-filter:blur(3px)}
+.modal-box{background:var(--bg2);border:1px solid var(--bd2);border-radius:20px;padding:24px 22px;width:100%;max-width:420px;animation:su .25s;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.modal-box h3{font-size:17px;font-weight:700;margin-bottom:3px}
+.modal-box .sub{font-size:12px;color:var(--t3);margin-bottom:16px}
+.modal-box .inp{margin-bottom:9px}
+.bar-r{margin-bottom:10px}
+.bar-l{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.bar-t{height:5px;border-radius:3px;background:var(--bg3)}
+.bar-f{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+
+/* Chart */
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:110px;padding:0 4px}
+.chart-b{flex:1;border-radius:5px 5px 0 0;transition:height .6s cubic-bezier(.16,1,.3,1);min-width:18px;position:relative}
+.chart-b .tp{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:600;font-family:var(--m);white-space:nowrap}
+.chart-b .lb{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--t3);white-space:nowrap}
+
+/* Excel upload area */
+.excel-zone{border:2px dashed var(--orange);border-radius:16px;padding:28px;text-align:center;cursor:pointer;background:rgba(212,140,85,.03);transition:background .2s}
+.excel-zone:hover{background:rgba(212,140,85,.06)}
+.excel-zone h4{font-size:14px;font-weight:700;margin:10px 0 4px}
+.excel-zone p{font-size:12px;color:var(--t3)}
+
+svg{display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+<div id="app" class="app"><div style="height:100dvh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px"><div style="width:44px;height:44px;border:3px solid rgba(212,140,85,.2);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite"></div><p style="color:var(--t2);font-size:13px;font-weight:600">Loading platform...</p></div></div>
+<script>
+// ═══ ICONS ═══
+const I={home:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg>`,gift:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 01-2 2H7a2 2 0 01-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 010-5C9 3 12 8 12 8s3-5 4.5-5a2.5 2.5 0 010 5"/></svg>`,clk:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,bel:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,bar:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,usr:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/></svg>`,usrs:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,bk:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,trp:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22223B" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 0012 0V2z"/></svg>`,out:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,chk:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,x:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,pls:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,sch:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,cn:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1110.34 18"/></svg>`,ar:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`,up:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,ph:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>`,tgt:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,dl:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,map:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`,file:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`,sun:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,moon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`};
+function ic(n,s){let v=I[n]||'';if(s)v=v.replace(/width="\d+"/,`width="${s}"`).replace(/height="\d+"/,`height="${s}"`);return v}
+
+// ═══ THEME ═══
+let theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+document.documentElement.setAttribute('data-theme',theme);
+function togTheme(){theme=theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);R()}
+
+// ═══ DATA ═══
+const K='rctm_v4';
+function ld(){try{const r=localStorage.getItem(K);if(r)return JSON.parse(r)}catch(e){}return null}
+function sv(d){try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}}
+
+const MODELS=[
+{id:'MA',nm:'Galaxy S24',ic:'📱',cl:'var(--lblue)',bg:'rgba(159,168,218,.1)'},
+{id:'MB',nm:'Galaxy A55',ic:'📲',cl:'var(--yellow)',bg:'rgba(212,216,110,.1)'},
+{id:'MC',nm:'Galaxy M34',ic:'📳',cl:'var(--orange)',bg:'rgba(212,140,85,.1)'},
+{id:'MD',nm:'Galaxy Tab S9',ic:'📟',cl:'var(--pgray)',bg:'rgba(110,106,142,.1)'},
+{id:'ME',nm:'Galaxy Watch 6',ic:'⌚',cl:'#4ECDC4',bg:'rgba(78,205,196,.1)'},
+];
+
+const BRANDS=[
+{id:'B01',nm:'Amazon',ct:'E-commerce',pt:500,sk:40,ic:'🛒',bg:'linear-gradient(135deg,#232f3e,#131921)',ds:'Amazon.in e-Gift Card',dm:[250,500,1000,2000],tg:'best'},
+{id:'B02',nm:'Flipkart',ct:'E-commerce',pt:500,sk:35,ic:'🛍️',bg:'linear-gradient(135deg,#2874f0,#1a5dc7)',ds:'Flipkart e-Gift Voucher',dm:[250,500,1000],tg:'best'},
+{id:'B03',nm:'Myntra',ct:'Fashion',pt:400,sk:25,ic:'👗',bg:'linear-gradient(135deg,#ff3f6c,#e8356a)',ds:'Fashion gift card',dm:[500,1000],tg:'hot'},
+{id:'B04',nm:'Swiggy',ct:'Food',pt:300,sk:60,ic:'🍽️',bg:'linear-gradient(135deg,#fc8019,#e06c00)',ds:'Food delivery voucher',dm:[200,500,1000]},
+{id:'B05',nm:'Zomato',ct:'Food',pt:300,sk:55,ic:'🍕',bg:'linear-gradient(135deg,#e23744,#c42d3a)',ds:'Dining & delivery',dm:[200,500]},
+{id:'B06',nm:'MakeMyTrip',ct:'Travel',pt:800,sk:15,ic:'✈️',bg:'linear-gradient(135deg,#ef4123,#0770E3)',ds:'Flights & hotels',dm:[1000,2000,5000],tg:'new'},
+{id:'B07',nm:'PVR INOX',ct:'Entertainment',pt:350,sk:50,ic:'🎬',bg:'linear-gradient(135deg,#1a1a2e,#2d1f3d)',ds:'Movie e-voucher',dm:[250,500],tg:'hot'},
+{id:'B08',nm:'Nykaa',ct:'Beauty',pt:400,sk:30,ic:'💄',bg:'linear-gradient(135deg,#fc2779,#d91f65)',ds:'Beauty & skincare',dm:[500,1000]},
+{id:'B09',nm:'BigBasket',ct:'Grocery',pt:350,sk:45,ic:'🧺',bg:'linear-gradient(135deg,#84c225,#6da31a)',ds:'Groceries & essentials',dm:[500,1000]},
+{id:'B10',nm:'Croma',ct:'Electronics',pt:1000,sk:10,ic:'📱',bg:'linear-gradient(135deg,#1a2a3a,#0f1f2f)',ds:'Electronics store',dm:[1000,2000],tg:'new'},
+{id:'B11',nm:'BookMyShow',ct:'Entertainment',pt:300,sk:40,ic:'🎭',bg:'linear-gradient(135deg,#c4242b,#9a1c22)',ds:'Events & movies',dm:[250,500]},
+{id:'B12',nm:'Starbucks',ct:'Food',pt:350,sk:30,ic:'☕',bg:'linear-gradient(135deg,#006241,#00432d)',ds:'Coffee & beverages',dm:[250,500],tg:'hot'},
+];
+const CTS=['All','E-commerce','Fashion','Food','Travel','Entertainment','Beauty','Grocery','Electronics'];
+const REGIONS=['West','North','South','East'];
+
+const DF={
+mgrs:[
+{id:'M01',nm:'Raj Patel',ph:'+91 98765 43210',store:'Navrangpura',pts:4500,st:'active',av:'RP',tier:'Gold',str:12,region:'West',
+ targets:{MA:{tgt:50,ach:38},MB:{tgt:30,ach:24},MC:{tgt:40,ach:35},MD:{tgt:20,ach:12},ME:{tgt:15,ach:8}},
+ imeis:['352093087463821','352093087463822'],totalImei:42,sales:820000},
+{id:'M02',nm:'Priya Shah',ph:'+91 87654 32109',store:'SG Highway',pts:2820,st:'active',av:'PS',tier:'Silver',str:8,region:'West',
+ targets:{MA:{tgt:40,ach:22},MB:{tgt:25,ach:18},MC:{tgt:35,ach:20},MD:{tgt:15,ach:8},ME:{tgt:10,ach:4}},
+ imeis:[],totalImei:28,sales:580000},
+{id:'M03',nm:'Amit Desai',ph:'+91 76543 21098',store:'Satellite',pts:6100,st:'active',av:'AD',tier:'Platinum',str:18,region:'West',
+ targets:{MA:{tgt:60,ach:52},MB:{tgt:35,ach:32},MC:{tgt:45,ach:40},MD:{tgt:25,ach:22},ME:{tgt:20,ach:16}},
+ imeis:['352093087463824'],totalImei:56,sales:1250000},
+{id:'M04',nm:'Sneha Joshi',ph:'+91 65432 10987',store:'Maninagar',pts:1480,st:'active',av:'SJ',tier:'Bronze',str:4,region:'North',
+ targets:{MA:{tgt:35,ach:12},MB:{tgt:20,ach:8},MC:{tgt:30,ach:14},MD:{tgt:10,ach:4},ME:{tgt:8,ach:2}},
+ imeis:[],totalImei:14,sales:320000},
+{id:'M05',nm:'Kiran Modi',ph:'+91 54321 09876',store:'Vastrapur',pts:7200,st:'active',av:'KM',tier:'Platinum',str:22,region:'West',
+ targets:{MA:{tgt:65,ach:58},MB:{tgt:40,ach:38},MC:{tgt:50,ach:45},MD:{tgt:30,ach:26},ME:{tgt:20,ach:18}},
+ imeis:['352093087463825','352093087463826'],totalImei:62,sales:1480000},
+{id:'M06',nm:'Meera Reddy',ph:'+91 43210 98765',store:'CG Road',pts:3650,st:'active',av:'MR',tier:'Gold',str:10,region:'South',
+ targets:{MA:{tgt:45,ach:35},MB:{tgt:28,ach:22},MC:{tgt:38,ach:30},MD:{tgt:18,ach:14},ME:{tgt:12,ach:9}},
+ imeis:[],totalImei:35,sales:720000},
+{id:'M07',nm:'Vikram Singh',ph:'+91 32109 87654',store:'CP Delhi',pts:5300,st:'active',av:'VS',tier:'Gold',str:16,region:'North',
+ targets:{MA:{tgt:55,ach:48},MB:{tgt:32,ach:28},MC:{tgt:42,ach:36},MD:{tgt:22,ach:18},ME:{tgt:16,ach:12}},
+ imeis:['352093087463827'],totalImei:48,sales:1100000},
+{id:'M08',nm:'Anita Nair',ph:'+91 21098 76543',store:'MG Road BLR',pts:4100,st:'active',av:'AN',tier:'Gold',str:6,region:'South',
+ targets:{MA:{tgt:50,ach:40},MB:{tgt:30,ach:25},MC:{tgt:40,ach:32},MD:{tgt:20,ach:16},ME:{tgt:14,ach:10}},
+ imeis:[],totalImei:40,sales:900000},
+],
+rw:BRANDS,
+tx:[
+{id:'T01',mid:'M01',tp:'credit',pt:1000,rs:'Monthly target bonus — April',dt:'2026-04-25',by:'System'},
+{id:'T02',mid:'M01',tp:'credit',pt:500,rs:'IMEI: 3 Galaxy S24 verified',dt:'2026-04-22',by:'System'},
+{id:'T03',mid:'M01',tp:'debit',pt:500,rs:'Redeemed: Amazon ₹500',dt:'2026-04-20',by:'System'},
+{id:'T04',mid:'M03',tp:'credit',pt:2000,rs:'Quarterly champion bonus',dt:'2026-04-01',by:'Admin'},
+{id:'T05',mid:'M05',tp:'credit',pt:1500,rs:'Galaxy S24 target achieved!',dt:'2026-03-28',by:'System'},
+],
+nf:[
+{id:'N01',mid:'M01',mg:'🎉 1,000 pts for April target!',dt:'2026-04-25',rd:false},
+{id:'N02',mid:'M01',mg:'📱 3 IMEI verified — 500 pts',dt:'2026-04-22',rd:false},
+{id:'N03',mid:'M01',mg:'🆕 MakeMyTrip cards now available',dt:'2026-04-20',rd:true},
+],
+rd:[
+{id:'R01',mid:'M01',rid:'B01',rnm:'Amazon ₹500',pt:500,sts:'approved',dt:'2026-04-20',dn:500},
+{id:'R02',mid:'M02',rid:'B07',rnm:'PVR ₹250',pt:350,sts:'pending',dt:'2026-04-22',dn:250},
+{id:'R03',mid:'M05',rid:'B02',rnm:'Flipkart ₹1000',pt:500,sts:'approved',dt:'2026-04-18',dn:1000},
+],
+imeiLog:['352093087463821','352093087463822','352093087463824','352093087463825','352093087463826','352093087463827'],
+};
+
+let db=ld()||JSON.parse(JSON.stringify(DF));
+let S={scr:'login',stp:'select',role:null,mid:null,tab:'home',ph:'',otp:['','','',''],ap:'',er:'',ct:'All',sr:'',sh:null,dm:0,tst:null,at:'dash',mo:null,md:{},imei:'',invTab:'imei',regNm:'',regPh:'',selModel:MODELS[0].id};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function td(){return new Date().toISOString().split('T')[0]}
+function mg(){return db.mgrs.find(m=>m.id===S.mid)}
+function mTx(){return db.tx.filter(t=>t.mid===S.mid)}
+function mNf(){return db.nf.filter(n=>n.mid===S.mid)}
+function rnk(){return[...db.mgrs].sort((a,b)=>b.pts-a.pts).findIndex(m=>m.id===S.mid)+1}
+function tst(m,t='ok'){S.tst={m,t};R();setTimeout(()=>{S.tst=null;R()},2800)}
+
+function R(){
+const a=document.getElementById('app');a.className='app';
+let h='';
+if(S.scr==='login')h=rL();
+else if(S.role==='mgr')h=rM();
+else h=rA();
+if(S.tst)h+=`<div class="toast toast-${S.tst.t}">${S.tst.t==='ok'?ic('chk'):''} ${S.tst.m}</div>`;
+a.innerHTML=h;B();
+}
+
+// ═══ LOGIN ═══
+function rL(){
+let c='';
+if(S.stp==='select'){
+c=`<div class="auth-hd"><div class="logo">${ic('trp')}</div><h1>Track. Achieve.<br><em>Get Rewarded.</em></h1><p>Retail chain rewards & target platform</p></div>
+<div class="auth-card">
+<div class="tabs-auth"><button class="tab-a on" data-a="gph">Manager Login</button><button class="tab-a" data-a="greg">Register</button></div>
+<button class="btn-p" data-a="gph">Login with OTP →</button><div style="height:10px"></div>
+<button class="btn-s" data-a="gad">Admin / HQ Panel</button>
+<p class="hint">OTP: 1234 | Admin: admin</p></div>`;
+}else if(S.stp==='register'){
+c=`<div class="auth-hd"><button class="btn-bk" data-a="bs">${ic('bk')} Back</button><h1>Register<br><em>New Account</em></h1><p>Store manager registration</p></div>
+<div class="auth-card"><input class="inp" placeholder="Full Name" id="reg-nm" value="${S.regNm}" style="margin-bottom:10px"><input class="inp" placeholder="Mobile Number (+91)" id="reg-ph" value="${S.regPh}" style="margin-bottom:14px"><button class="btn-p" data-a="doreg">Register & Get OTP →</button></div>`;
+}else if(S.stp==='phone'){
+const o=db.mgrs.map(m=>`<option value="${m.ph}">${m.nm} — ${m.store}</option>`).join('');
+c=`<div class="auth-hd"><button class="btn-bk" data-a="bs">${ic('bk')} Back</button><h1>Welcome<br><em>back</em></h1><p>Select your store account</p></div>
+<div class="auth-card"><select class="inp" id="phs" style="margin-bottom:12px"><option value="">Choose account</option>${o}</select><button class="btn-p" data-a="sotp" ${S.ph?'':'disabled'}>Send OTP →</button></div>`;
+}else if(S.stp==='otp'){
+c=`<div class="auth-hd"><button class="btn-bk" data-a="bph">${ic('bk')} Back</button><h1>Verify<br><em>OTP</em></h1><p>4-digit code sent to your phone</p></div>
+<div class="auth-card"><div class="otp-r">${[0,1,2,3].map(i=>`<input class="otp-b" id="o${i}" type="text" inputmode="numeric" maxlength="1" value="${S.otp[i]}">`).join('')}</div>${S.er?`<p class="err">⚠ ${S.er}</p>`:''}<button class="btn-p" data-a="vfy">Verify & Login</button><p class="hint">USE: 1234</p></div>`;
+}else{
+c=`<div class="auth-hd"><button class="btn-bk" data-a="bs">${ic('bk')} Back</button><h1>Admin<br><em>Access</em></h1><p>Head office credentials</p></div>
+<div class="auth-card"><input type="password" class="inp" id="aps" placeholder="Admin password" value="${S.ap}" style="margin-bottom:12px">${S.er?`<p class="err">⚠ ${S.er}</p>`:''}<button class="btn-p" data-a="alog">Login as Admin</button><p class="hint">PASSWORD: admin</p></div>`;
+}
+return`<div class="auth-bg"><div class="orb1"></div><div class="orb2"></div>${c}</div>`;
+}
+
+// ═══ MANAGER ═══
+function rM(){
+const m=mg();if(!m)return'';
+const ns=mNf(),ur=ns.filter(n=>!n.rd).length;
+let ct='',sh='';
+
+if(S.tab==='home'){
+const r=rnk(),totalTgt=Object.values(m.targets).reduce((s,t)=>s+t.tgt,0),totalAch=Object.values(m.targets).reduce((s,t)=>s+t.ach,0),pct=Math.round((totalAch/totalTgt)*100);
+ct=`<div class="hero"><p class="lbl">Available Points</p><p class="val">${m.pts.toLocaleString()}</p><p class="sub">${m.store} · ${m.region} Region</p>
+<div class="badges"><span class="badge" style="background:rgba(46,232,157,.12);color:#2ee89d">🏆 #${r}</span><span class="badge" style="background:rgba(159,168,218,.12);color:var(--lblue)">⭐ ${m.tier}</span><span class="badge" style="background:rgba(212,140,85,.12);color:var(--orange)">🔥 ${m.str}d</span><span class="badge" style="background:rgba(212,216,110,.12);color:var(--yellow)">📱 ${m.totalImei}</span></div></div>
+
+<div class="model-sec"><div class="model-hdr"><h3>🎯 Model-wise Targets</h3><span style="font-size:12px;color:var(--t2);font-family:var(--m)">${pct}% overall</span></div>
+${MODELS.map(mod=>{const t=m.targets[mod.id]||{tgt:0,ach:0};const p=t.tgt?Math.round((t.ach/t.tgt)*100):0;const pend=t.tgt-t.ach;const cl=p>=80?'#2ee89d':p>=50?'var(--yellow)':'var(--orange)';
+return`<div class="model-card"><div class="model-top"><div class="model-name"><div class="icon" style="background:${mod.bg};color:${mod.cl}">${mod.ic}</div>${mod.nm}</div><div class="model-pct" style="color:${cl}">${p}%</div></div>
+<div class="model-bar"><div class="model-fill" style="width:${Math.min(p,100)}%;background:linear-gradient(90deg,${cl},${cl}88)"></div></div>
+<div class="model-stats"><span>Target: <b class="num">${t.tgt}</b></span><span>Done: <b class="num" style="color:#2ee89d">${t.ach}</b></span><span>Pending: <b class="num" style="color:var(--orange)">${pend}</b></span></div></div>`}).join('')}</div>
+
+<div class="qa">${[{t:'upload',i:'up',l:'Upload',c:'var(--orange)'},{t:'catalog',i:'gift',l:'Rewards',c:'var(--yellow)'},{t:'leaderboard',i:'bar',l:'Rank',c:'var(--lblue)'},{t:'profile',i:'usr',l:'Profile',c:'var(--pgray)'}].map(q=>`<button class="qa-btn" data-tab="${q.t}"><div class="qa-ic" style="background:${q.c}18;color:${q.c}">${ic(q.i,18)}</div><span class="qa-lb">${q.l}</span></button>`).join('')}</div>
+
+<div class="sec-h"><span class="t">Recent activity</span><button class="lk" data-tab="history">See all</button></div>
+${mTx().slice(0,3).map(txR).join('')}`;
+}else if(S.tab==='upload'){
+ct=`<h2 class="pg-t">Upload Sales</h2>
+<div style="display:flex;gap:7px;margin-bottom:12px"><button class="chip ${S.invTab==='imei'?'on':''}" data-inv="imei">📱 IMEI Entry</button><button class="chip ${S.invTab==='invoice'?'on':''}" data-inv="invoice">📄 Invoice</button></div>
+${S.invTab==='imei'?`
+<div class="imei-box"><h3>${ic('ph',16)} Enter IMEI</h3>
+<select class="inp" id="sel-model" style="margin-bottom:8px">${MODELS.map(mod=>`<option value="${mod.id}" ${S.selModel===mod.id?'selected':''}>${mod.nm}</option>`).join('')}</select>
+<div class="imei-row"><input class="inp" placeholder="15-digit IMEI" id="imei-val" value="${S.imei}" maxlength="15" inputmode="numeric"><button data-a="add-imei">${ic('pls',12)} Add</button></div>
+<p style="font-size:11px;color:var(--t3);margin-bottom:8px">Points per IMEI: <strong style="color:var(--orange)">150 pts</strong></p>
+${m.imeis.length?`<div style="max-height:140px;overflow-y:auto">${m.imeis.map(im=>`<div class="imei-item"><span>${im}</span><span class="pill" style="background:rgba(46,232,157,.1);color:#2ee89d">✓ OK</span></div>`).join('')}</div>`:'<p style="font-size:12px;color:var(--t3);text-align:center;padding:14px">No entries yet</p>'}
+</div>
+<div class="imei-box"><h3>🛡️ Fraud Protection</h3><p style="font-size:12px;color:var(--t2);line-height:1.5">• Duplicate IMEI check across all stores<br>• 15-digit format validation<br>• Suspicious pattern flagging<br>• Admin review queue</p></div>
+`:`
+<div class="imei-box"><h3>${ic('up',16)} Upload Invoice</h3>
+<div class="upload-zone" data-a="upload-inv">${ic('up',28)}<p>Tap to upload invoice photo</p><p style="font-size:10px;color:var(--t3);margin-top:3px">JPG, PNG, PDF · Max 5MB</p></div>
+<p style="font-size:11px;color:var(--t3);margin-top:8px">Points per invoice: <strong style="color:var(--orange)">200 pts</strong></p>
+</div>
+`}`;
+}else if(S.tab==='catalog'){
+const fl=S.ct==='All'?db.rw:db.rw.filter(b=>b.ct===S.ct);
+const sr=S.sr?fl.filter(b=>b.nm.toLowerCase().includes(S.sr.toLowerCase())):fl;
+ct=`<h2 class="pg-t">Reward Catalog</h2><div class="sr-w">${ic('sch')}<input class="inp" placeholder="Search brands..." value="${S.sr}" id="bsr" style="padding-left:36px"></div>
+<div class="chips">${CTS.map(c=>`<button class="chip ${S.ct===c?'on':''}" data-ct="${c}">${c}</button>`).join('')}</div>
+<div class="b-grid">${sr.map(bCard).join('')}</div>`;
+}else if(S.tab==='rewards'){
+const rwData=[
+{ic:'🏆',nm:'Monthly Target Bonus',pt:1000,st:'achieved',ds:'Hit 80%+ of all targets'},
+{ic:'🎯',nm:'Model Champion',pt:500,st:'achieved',ds:'100% on any model'},
+{ic:'📱',nm:'IMEI Milestone — 50',pt:750,st:m.totalImei>=50?'achieved':'pending',ds:'Upload 50 IMEI entries'},
+{ic:'🔥',nm:'15-Day Streak',pt:300,st:m.str>=15?'achieved':'pending',ds:'15 consecutive active days'},
+{ic:'💎',nm:'Platinum Performer',pt:2000,st:m.tier==='Platinum'?'achieved':'locked',ds:'Reach Platinum tier'},
+{ic:'⭐',nm:'Top 3 Rank',pt:1500,st:rnk()<=3?'eligible':'locked',ds:'Finish in top 3'},
+];
+ct=`<h2 class="pg-t">My Rewards</h2>
+<div class="rw-grid">${rwData.map(r=>`<div class="rw-card"><div class="rw-icon">${r.ic}</div><p class="rw-name">${r.nm}</p><p class="rw-pts">${r.pt} pts</p><p style="font-size:10px;color:var(--t3);margin:4px 0">${r.ds}</p>
+<span class="rw-status" style="background:${r.st==='achieved'?'rgba(46,232,157,.1)':r.st==='eligible'?'rgba(212,140,85,.1)':r.st==='pending'?'rgba(212,216,110,.1)':'rgba(255,255,255,.05)'};color:${r.st==='achieved'?'#2ee89d':r.st==='eligible'?'var(--orange)':r.st==='pending'?'var(--yellow)':'var(--t3)'}">${r.st==='achieved'?'✓ Achieved':r.st==='eligible'?'★ Eligible':r.st==='pending'?'⏳ In Progress':'🔒 Locked'}</span>
+</div>`).join('')}</div>`;
+}else if(S.tab==='history'){
+ct=`<h2 class="pg-t">History</h2>${mTx().map(txR).join('')||'<p style="color:var(--t3);text-align:center;margin-top:30px">No transactions</p>'}`;
+}else if(S.tab==='leaderboard'){
+const lb=[...db.mgrs].sort((a,b)=>b.pts-a.pts),t3=lb.slice(0,3),rs=lb.slice(3);
+ct=`<h2 class="pg-t">Leaderboard</h2>
+<div class="pod">${t3[1]?`<div class="pod-c"><div class="pod-av" style="width:42px;height:42px;background:linear-gradient(135deg,#94a3b8,#64748b);font-size:12px;color:#fff">${t3[1].av}</div><p class="pod-nm">${t3[1].nm}</p><p class="pod-pt">${t3[1].pts.toLocaleString()}</p><div class="pod-pd" style="width:62px;height:48px;background:linear-gradient(180deg,rgba(148,163,184,.1),transparent)">2</div></div>`:''}
+${t3[0]?`<div class="pod-c"><div class="pod-av" style="width:50px;height:50px;background:linear-gradient(135deg,var(--yellow),var(--orange));font-size:14px;color:var(--navy)"><span class="cr">👑</span>${t3[0].av}</div><p class="pod-nm">${t3[0].nm}</p><p class="pod-pt">${t3[0].pts.toLocaleString()}</p><div class="pod-pd" style="width:62px;height:66px;background:linear-gradient(180deg,rgba(212,140,85,.1),transparent)">1</div></div>`:''}
+${t3[2]?`<div class="pod-c"><div class="pod-av" style="width:38px;height:38px;background:linear-gradient(135deg,#cd7f32,#a0522d);font-size:11px;color:#fff">${t3[2].av}</div><p class="pod-nm">${t3[2].nm}</p><p class="pod-pt">${t3[2].pts.toLocaleString()}</p><div class="pod-pd" style="width:62px;height:34px;background:linear-gradient(180deg,rgba(205,127,50,.1),transparent)">3</div></div>`:''}</div>
+${rs.map((g,i)=>`<div class="lb-row ${g.id===m.id?'me':''}"><span class="lb-rk">${i+4}</span><div class="lb-av">${g.av}</div><div style="flex:1"><p style="font-size:12px;font-weight:600">${g.nm}${g.id===m.id?' <span style="font-size:9px;color:var(--orange)">(You)</span>':''}</p><p style="font-size:10px;color:var(--t3)">${g.store}</p></div><span style="font-size:13px;font-weight:700;font-family:var(--m);color:var(--orange)">${g.pts.toLocaleString()}</span></div>`).join('')}`;
+}else if(S.tab==='notifications'){
+ct=`<h2 class="pg-t">Notifications</h2>${ns.map(n=>`<div class="nfc ${n.rd?'':'ur'}"><p style="font-size:12px;line-height:1.5;margin-bottom:2px">${n.mg}</p><p style="font-size:10px;color:var(--t3)">${n.dt}</p></div>`).join('')}`;
+}else if(S.tab==='profile'){
+const r=rnk(),tx=mTx(),er=tx.filter(t=>t.tp==='credit').reduce((s,t)=>s+t.pt,0),rd=tx.filter(t=>t.tp==='debit').reduce((s,t)=>s+t.pt,0);
+ct=`<div class="prof-card"><div class="prof-av">${m.av}</div><p style="font-size:17px;font-weight:800">${m.nm}</p><p style="font-size:11px;color:var(--t3);font-family:var(--m)">${m.id} · ${m.tier}</p><p style="font-size:12px;color:var(--t2);margin-top:2px">${m.store} · ${m.region}</p>
+<div class="prof-stats"><div class="prof-s"><p class="v" style="color:var(--orange)">${m.pts.toLocaleString()}</p><p class="l">Balance</p></div><div class="prof-s"><p class="v" style="color:#2ee89d">${er.toLocaleString()}</p><p class="l">Earned</p></div><div class="prof-s"><p class="v" style="color:var(--lblue)">${m.totalImei}</p><p class="l">IMEIs</p></div></div></div>
+<div class="prof-acts">
+<div class="prof-row" data-tab="rewards">${ic('gift')} <span>My Rewards</span> ${ic('ar')}</div>
+<div class="prof-row" data-tab="history">${ic('clk')} <span>History</span> ${ic('ar')}</div>
+<div class="prof-row" data-tab="upload">${ic('up')} <span>Upload Sales</span> ${ic('ar')}</div>
+<div class="prof-row" onclick="togTheme()" style="cursor:pointer">${theme==='dark'?ic('sun'):ic('moon')} <span>${theme==='dark'?'Light':'Dark'} Mode</span> <button class="theme-tog" style="pointer-events:none"></button></div>
+<div class="prof-row" style="color:#E74C3C;border-color:rgba(231,76,60,.12)" data-a="lo">${ic('out')} <span>Logout</span> ${ic('ar')}</div>
+</div>`;
+}
+
+// Sheet
+if(S.sh){const b=db.rw.find(r=>r.id===S.sh);if(b){const sd=S.dm||b.dm[0],pn=Math.round(b.pt*(sd/b.dm[0])),cr=m.pts>=pn&&b.sk>0;
+sh=`<div class="sh-bg" data-a="cs"></div><div class="sheet"><div class="sh-bar"></div><div class="sh-hero"><div class="sh-icon" style="background:${b.bg}">${b.ic}</div><div><p class="sh-name">${b.nm}</p><p class="sh-cat">${b.ct}</p></div></div>
+<div class="sh-body"><div class="sh-desc">${b.ds}</div>
+<div class="sh-g3"><div class="sh-gd"><p class="v" style="color:var(--orange)">${pn}</p><p class="l">Points</p></div><div class="sh-gd"><p class="v" style="color:#2ee89d">${b.sk}</p><p class="l">Stock</p></div><div class="sh-gd"><p class="v" style="color:var(--lblue)">1yr</p><p class="l">Validity</p></div></div>
+<p class="sh-sub">Denomination</p><div class="dm-row">${b.dm.map(d=>`<button class="dm-btn ${sd===d?'on':''}" data-dm="${d}">₹${d.toLocaleString()}</button>`).join('')}</div>
+<button class="sh-btn" style="background:${cr?'linear-gradient(135deg,var(--orange),#c07840)':'var(--bg3)'};color:${cr?'#fff':'var(--t3)'}" ${cr?'data-a="rdm"':'disabled'}>${cr?`Redeem for ${pn} points`:`Need ${pn-m.pts} more pts`}</button>
+<p style="text-align:center;font-size:11px;color:var(--t3);margin-top:8px;font-family:var(--m)">After: ${Math.max(0,m.pts-pn).toLocaleString()} pts</p>
+</div></div>`;}}
+
+return`<div class="m-hdr"><div><p class="greet">Welcome back</p><p class="name">${m.nm}</p></div><div class="hdr-acts"><button class="hdr-btn" data-tab="notifications">${ic('bel',18)}${ur?'<div class="dot"></div>':''}</button><button class="hdr-btn" onclick="togTheme()">${theme==='dark'?ic('sun',16):ic('moon',16)}</button></div></div>
+<div class="content">${ct}</div>
+<div class="bnav">${[{id:'home',i:'home',l:'Home'},{id:'upload',i:'up',l:'Upload'},{id:'catalog',i:'gift',l:'Rewards'},{id:'leaderboard',i:'bar',l:'Rank'},{id:'profile',i:'usr',l:'Profile'}].map(t=>`<button class="bn-it ${S.tab===t.id?'on':''}" data-tab="${t.id}" style="position:relative"><div class="bn-dot"></div>${ic(t.i)}<span class="bn-lb">${t.l}</span></button>`).join('')}</div>${sh}`;
+}
+
+function bCard(b){
+const tg=b.tg?`<span class="tag" style="background:${b.tg==='hot'?'rgba(231,76,60,.12)':b.tg==='new'?'rgba(29,212,232,.1)':'rgba(212,216,110,.12)'};color:${b.tg==='hot'?'#E74C3C':b.tg==='new'?'#1dd4e8':'var(--yellow)'}">${b.tg==='hot'?'🔥HOT':b.tg==='new'?'✨NEW':'⭐TOP'}</span>`:'';
+return`<div class="b-card" data-br="${b.id}"><div class="b-img" style="background:${b.bg}">${tg}<span style="font-size:30px;z-index:1">${b.ic}</span></div><div class="b-inf"><p>${b.nm}</p><div class="row"><span style="color:var(--orange);font-weight:700;font-family:var(--m)">${b.pt} pts</span><span style="color:var(--t3)">${b.sk} left</span></div></div></div>`;
+}
+function txR(tx){return`<div class="tx"><div class="tx-ic" style="background:${tx.tp==='credit'?'rgba(46,232,157,.1)':'rgba(231,76,60,.1)'};color:${tx.tp==='credit'?'#2ee89d':'#E74C3C'}">${tx.tp==='credit'?'+':'−'}</div><div class="tx-info"><p class="tx-rs">${tx.rs}</p><p class="tx-mt">${tx.dt} · ${tx.by}</p></div><span class="tx-am" style="color:${tx.tp==='credit'?'#2ee89d':'#E74C3C'}">${tx.tp==='credit'?'+':'−'}${tx.pt}</span></div>`}
+
+// ═══ ADMIN ═══
+function rA(){
+const pnd=db.rd.filter(r=>r.sts==='pending'),tPts=db.mgrs.reduce((s,m)=>s+m.pts,0),tImei=db.mgrs.reduce((s,m)=>s+m.totalImei,0);
+const tabs=[{id:'dash',i:'home',l:'Dashboard'},{id:'mgrs',i:'usrs',l:'Stores'},{id:'tgts',i:'tgt',l:'Targets'},{id:'rws',i:'gift',l:'Rewards'},{id:'rds',i:'chk',l:'Approvals'},{id:'rpt',i:'bar',l:'Reports'}];
+let ct='',mo='';
+
+if(S.at==='dash'){
+const top=[...db.mgrs].sort((a,b)=>b.pts-a.pts).slice(0,5);
+ct=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h1 style="font-size:22px;font-weight:800">Dashboard</h1><button class="theme-tog" onclick="togTheme()"></button></div>
+<div class="s-grid">${[{l:'Total Stores',v:db.mgrs.length,c:'var(--lblue)'},{l:'Points Pool',v:tPts.toLocaleString(),c:'var(--orange)'},{l:'Total IMEI',v:tImei,c:'var(--yellow)'},{l:'Pending',v:pnd.length,c:'#E74C3C'}].map(s=>`<div class="s-card"><p class="sl">${s.l}</p><p class="sv" style="color:${s.c}">${s.v}</p></div>`).join('')}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="c-panel"><h3>🏆 Top Stores</h3>${top.map((m,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i<4?'border-bottom:1px solid var(--bd)':''}"><span style="width:20px;font-size:12px;font-weight:700;font-family:var(--m);color:${i<3?'var(--orange)':'var(--t3)'}">#${i+1}</span><div class="lb-av" style="width:26px;height:26px;font-size:9px">${m.av}</div><div style="flex:1"><p style="font-size:11px;font-weight:600">${m.nm}</p><p style="font-size:9px;color:var(--t3)">${m.store}</p></div><span style="font-size:12px;font-weight:700;font-family:var(--m);color:var(--orange)">${m.pts.toLocaleString()}</span></div>`).join('')}</div>
+<div class="c-panel"><h3>📊 Model Performance</h3>${MODELS.map(mod=>{const total=db.mgrs.reduce((s,m)=>s+(m.targets[mod.id]?.ach||0),0),target=db.mgrs.reduce((s,m)=>s+(m.targets[mod.id]?.tgt||0),0),p=target?Math.round((total/target)*100):0;return`<div class="bar-r"><div class="bar-l"><span>${mod.nm}</span><span style="font-weight:700;font-family:var(--m);color:${mod.cl}">${total}/${target}</span></div><div class="bar-t"><div class="bar-f" style="width:${p}%;background:${mod.cl}"></div></div></div>`}).join('')}</div>
+</div>`;
+}else if(S.at==='mgrs'){
+const fl=db.mgrs.filter(m=>m.nm.toLowerCase().includes(S.sr.toLowerCase())||m.store.toLowerCase().includes(S.sr.toLowerCase()));
+ct=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><h1 style="font-size:22px;font-weight:800">Store Managers</h1><div style="display:flex;gap:8px"><button class="btn-p" style="width:auto;padding:9px 14px;font-size:12px" data-a="am">${ic('pls')} Add</button><button class="btn-s" style="width:auto;padding:9px 14px;font-size:12px" data-a="excel">${ic('up',14)} Excel Upload</button></div></div>
+<div class="sr-w">${ic('sch')}<input class="inp" placeholder="Search..." id="msr" value="${S.sr}" style="padding-left:36px"></div>
+<div class="c-panel" style="overflow-x:auto"><table><thead><tr><th>Manager</th><th>Store</th><th>Region</th><th>Points</th><th>IMEI</th><th>Target %</th><th>Tier</th><th>Actions</th></tr></thead><tbody>
+${fl.map(m=>{const tA=Object.values(m.targets).reduce((s,t)=>s+t.ach,0),tT=Object.values(m.targets).reduce((s,t)=>s+t.tgt,0),p=tT?Math.round((tA/tT)*100):0;return`<tr><td><div style="display:flex;align-items:center;gap:6px"><div class="lb-av" style="width:26px;height:26px;font-size:9px">${m.av}</div><div><p style="font-weight:600">${m.nm}</p><p style="font-size:10px;color:var(--t3)">${m.ph}</p></div></div></td>
+<td style="font-size:11px">${m.store}</td><td><span class="pill" style="background:rgba(159,168,218,.1);color:var(--lblue)">${m.region}</span></td>
+<td style="font-weight:700;font-family:var(--m);color:var(--orange)">${m.pts.toLocaleString()}</td>
+<td style="font-family:var(--m)">${m.totalImei}</td>
+<td><div style="width:50px"><div style="font-size:9px;color:var(--t3);margin-bottom:2px">${p}%</div><div style="height:4px;border-radius:2px;background:var(--bg3)"><div style="height:100%;border-radius:2px;width:${Math.min(p,100)}%;background:${p>=80?'#2ee89d':p>=50?'var(--yellow)':'#E74C3C'}"></div></div></div></td>
+<td><span class="pill" style="background:rgba(212,140,85,.1);color:var(--orange)">${m.tier}</span></td>
+<td><button class="btn-x" style="background:rgba(212,140,85,.1);color:var(--orange)" data-ap="${m.id}">${ic('cn',11)} Pts</button></td></tr>`}).join('')}</tbody></table></div>`;
+}else if(S.at==='tgts'){
+ct=`<h1 style="font-size:22px;font-weight:800;margin-bottom:14px">Target Management</h1>
+<div class="c-panel"><h3>🎯 Current Model Targets (All Stores)</h3>
+<table><thead><tr><th>Model</th>${db.mgrs.slice(0,5).map(m=>`<th>${m.nm.split(' ')[0]}</th>`).join('')}</tr></thead><tbody>
+${MODELS.map(mod=>`<tr><td style="font-weight:600"><span style="margin-right:6px">${mod.ic}</span>${mod.nm}</td>${db.mgrs.slice(0,5).map(m=>{const t=m.targets[mod.id]||{tgt:0,ach:0};const p=t.tgt?Math.round((t.ach/t.tgt)*100):0;return`<td><div style="font-family:var(--m);font-size:11px"><span style="color:${p>=80?'#2ee89d':p>=50?'var(--yellow)':'#E74C3C'};font-weight:700">${t.ach}</span><span style="color:var(--t3)">/${t.tgt}</span></div></td>`}).join('')}</tr>`).join('')}
+</tbody></table></div>
+<div class="c-panel"><h3>📊 Model-wise Summary</h3>
+${MODELS.map(mod=>{const tA=db.mgrs.reduce((s,m)=>s+(m.targets[mod.id]?.ach||0),0),tT=db.mgrs.reduce((s,m)=>s+(m.targets[mod.id]?.tgt||0),0),p=tT?Math.round((tA/tT)*100):0;
+return`<div class="bar-r"><div class="bar-l"><span>${mod.ic} ${mod.nm}</span><span style="font-weight:700;font-family:var(--m)">${tA}/${tT} (${p}%)</span></div><div class="bar-t"><div class="bar-f" style="width:${p}%;background:${mod.cl}"></div></div></div>`}).join('')}
+</div>`;
+}else if(S.at==='rws'){
+ct=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1 style="font-size:22px;font-weight:800">Rewards</h1><button class="btn-p" style="width:auto;padding:9px 14px;font-size:12px" data-a="ar">${ic('pls')} Add</button></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">${db.rw.map(b=>`<div class="c-panel" style="padding:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:38px;height:38px;border-radius:10px;background:${b.bg};display:flex;align-items:center;justify-content:center;font-size:18px">${b.ic}</div><div><p style="font-size:13px;font-weight:700">${b.nm}</p><p style="font-size:10px;color:var(--t3)">${b.ct}</p></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700;font-family:var(--m);color:var(--orange)">${b.pt} pts</span><span style="font-size:10px;color:${b.sk>10?'#2ee89d':'var(--orange)'}">${b.sk} stock</span></div></div>`).join('')}</div>`;
+}else if(S.at==='rds'){
+ct=`<h1 style="font-size:22px;font-weight:800;margin-bottom:14px">Approvals</h1>
+<div class="c-panel" style="overflow-x:auto"><table><thead><tr><th>Manager</th><th>Reward</th><th>Value</th><th>Points</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+${db.rd.map(r=>{const mg=db.mgrs.find(m=>m.id===r.mid);return`<tr><td style="font-weight:500">${mg?.nm||'?'}</td><td>${r.rnm}</td><td style="font-family:var(--m)">₹${r.dn?.toLocaleString()||'—'}</td><td style="font-weight:600;font-family:var(--m)">${r.pt}</td><td style="color:var(--t3)">${r.dt}</td>
+<td><span class="pill" style="background:${r.sts==='approved'?'rgba(46,232,157,.1)':r.sts==='pending'?'rgba(212,140,85,.1)':'rgba(231,76,60,.1)'};color:${r.sts==='approved'?'#2ee89d':r.sts==='pending'?'var(--orange)':'#E74C3C'}">${r.sts}</span></td>
+<td>${r.sts==='pending'?`<button class="btn-x" style="background:rgba(46,232,157,.1);color:#2ee89d;margin-right:3px" data-apv="${r.id}">Approve</button><button class="btn-x" style="background:rgba(231,76,60,.1);color:#E74C3C" data-rej="${r.id}">Reject</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`;
+}else if(S.at==='rpt'){
+const maxPts=Math.max(...db.mgrs.map(m=>m.pts),1);
+ct=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1 style="font-size:22px;font-weight:800">Reports</h1><button class="btn-s" style="width:auto;padding:8px 14px;font-size:12px" data-a="export">${ic('dl',14)} Export CSV</button></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="c-panel"><h3>📊 Points Distribution</h3>${[...db.mgrs].sort((a,b)=>b.pts-a.pts).map(m=>`<div class="bar-r"><div class="bar-l"><span>${m.nm}</span><span style="color:var(--orange);font-weight:700;font-family:var(--m)">${m.pts.toLocaleString()}</span></div><div class="bar-t"><div class="bar-f" style="width:${(m.pts/maxPts)*100}%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div></div>`).join('')}</div>
+<div class="c-panel"><h3>🗺️ Region Summary</h3>${REGIONS.map(r=>{const ms=db.mgrs.filter(m=>m.region===r),pts=ms.reduce((s,m)=>s+m.pts,0),imei=ms.reduce((s,m)=>s+m.totalImei,0);return`<div style="padding:8px 0;border-bottom:1px solid var(--bd)"><p style="font-size:12px;font-weight:700">${r} Region <span style="color:var(--t3);font-weight:500">(${ms.length} stores)</span></p><div style="display:flex;gap:16px;margin-top:4px;font-size:11px"><span>Pts: <b style="color:var(--orange);font-family:var(--m)">${pts.toLocaleString()}</b></span><span>IMEI: <b style="font-family:var(--m)">${imei}</b></span></div></div>`}).join('')}</div>
+</div>`;
+}
+
+// Modals
+if(S.mo==='ap'){const mg=db.mgrs.find(m=>m.id===S.md.mid);mo=`<div class="modal-bg" data-a="cm"><div class="modal-box" onclick="event.stopPropagation()"><h3>Add / Deduct Points</h3><p class="sub">${mg?.nm}</p><input type="number" class="inp" placeholder="Points (negative to deduct)" id="pv"><input class="inp" placeholder="Reason" id="pr"><button class="btn-p" style="margin-top:6px" data-a="sp">Submit</button></div></div>`}
+else if(S.mo==='am'){mo=`<div class="modal-bg" data-a="cm"><div class="modal-box" onclick="event.stopPropagation()"><h3>Add Store Manager</h3><p class="sub">Enter details</p><input class="inp" placeholder="Full name" id="nn"><input class="inp" placeholder="Phone" id="np"><input class="inp" placeholder="Store name" id="ns"><select class="inp" id="nr">${REGIONS.map(r=>`<option>${r}</option>`).join('')}</select><button class="btn-p" style="margin-top:6px" data-a="sm">Add Manager</button></div></div>`}
+else if(S.mo==='ar'){mo=`<div class="modal-bg" data-a="cm"><div class="modal-box" onclick="event.stopPropagation()"><h3>Add Reward</h3><p class="sub">New brand card</p><input class="inp" placeholder="Brand name" id="rn"><select class="inp" id="rc">${CTS.slice(1).map(c=>`<option>${c}</option>`).join('')}</select><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><input type="number" class="inp" placeholder="Points" id="rp"><input type="number" class="inp" placeholder="Stock" id="rs"></div><button class="btn-p" style="margin-top:6px" data-a="sr">Add</button></div></div>`}
+else if(S.mo==='excel'){mo=`<div class="modal-bg" data-a="cm"><div class="modal-box" onclick="event.stopPropagation()"><h3>📤 Bulk Upload — Excel</h3><p class="sub">Upload store managers & targets via Excel</p>
+<div class="excel-zone" data-a="do-excel">${ic('file',28)}<h4>Drop Excel file here</h4><p>.xlsx or .csv with columns: Name, Mobile, Store ID, Model targets</p></div>
+<div style="margin-top:14px;padding:14px;background:var(--bg);border:1px solid var(--bd);border-radius:12px"><p style="font-size:12px;font-weight:700;margin-bottom:8px">Expected format:</p>
+<table style="font-size:10px"><thead><tr><th>Name</th><th>Mobile</th><th>Store</th><th>S24</th><th>A55</th><th>M34</th></tr></thead><tbody><tr><td>John</td><td>9876543210</td><td>Delhi-01</td><td>50</td><td>30</td><td>40</td></tr></tbody></table>
+</div>
+<button class="btn-p" style="margin-top:14px" data-a="do-excel">Simulate Upload (Demo)</button>
+</div></div>`}
+
+const snv=tabs.map(t=>`<button class="a-btn ${S.at===t.id?'on':''}" data-at="${t.id}">${ic(t.i,18)} ${t.l}${t.id==='rds'&&pnd.length?`<span style="margin-left:auto;background:#E74C3C;color:#fff;font-size:8px;padding:1px 5px;border-radius:8px">${pnd.length}</span>`:''}</button>`).join('');
+return`${mo}<div class="a-wrap"><div class="a-side"><div class="logo"><div class="mk">${ic('trp',16)}</div><div><p style="font-size:14px;font-weight:700">Chain Rewards</p><p style="font-size:9px;color:var(--t3)">Admin Panel</p></div></div>${snv}<div style="margin-top:auto;padding:12px 0;border-top:1px solid var(--bd)"><button class="a-btn" style="color:#E74C3C" data-a="lo">${ic('out',18)} Logout</button></div></div>
+<div class="a-body">${ct}</div>
+<div class="a-mnav">${tabs.slice(0,5).map(t=>`<button class="bn-it ${S.at===t.id?'on':''}" data-at="${t.id}">${ic(t.i)}<span class="bn-lb" style="font-size:8px">${t.l}</span></button>`).join('')}</div></div>`;
+}
+
+// ═══ BINDINGS ═══
+function B(){
+document.querySelectorAll('[data-a]').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const a=el.dataset.a;
+if(a==='gph'){S.stp='phone';S.er='';R()}
+else if(a==='greg'){S.stp='register';S.er='';R()}
+else if(a==='gad'){S.stp='admin';S.er='';R()}
+else if(a==='bs'){S.stp='select';S.er='';R()}
+else if(a==='bph'){S.stp='phone';S.er='';R()}
+else if(a==='sotp'&&S.ph){S.stp='otp';S.otp=['','','',''];S.er='';R();setTimeout(()=>document.getElementById('o0')?.focus(),50)}
+else if(a==='vfy'){if(S.otp.join('')==='1234'){const m=db.mgrs.find(m=>m.ph===S.ph)||db.mgrs[0];S.mid=m.id;S.role='mgr';S.scr='app';S.tab='home';R()}else{S.er='Invalid OTP. Use 1234.';R()}}
+else if(a==='alog'){if(S.ap==='admin'){S.role='adm';S.scr='app';S.at='dash';R()}else{S.er="Use 'admin'";R()}}
+else if(a==='lo'){S.scr='login';S.stp='select';S.role=null;S.mid=null;S.er='';S.ap='';S.tab='home';R()}
+else if(a==='cs'){S.sh=null;R()}
+else if(a==='rdm'){doRdm()}
+else if(a==='am'){S.mo='am';R()}
+else if(a==='ar'){S.mo='ar';R()}
+else if(a==='excel'){S.mo='excel';R()}
+else if(a==='cm'){S.mo=null;R()}
+else if(a==='doreg'){const n=document.getElementById('reg-nm')?.value,p=document.getElementById('reg-ph')?.value;if(!n||!p)return;db.mgrs.push({id:'M'+uid(),nm:n,ph:p,store:'New Store',pts:0,st:'active',av:n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),tier:'Bronze',str:0,region:'West',targets:{MA:{tgt:30,ach:0},MB:{tgt:20,ach:0},MC:{tgt:25,ach:0},MD:{tgt:10,ach:0},ME:{tgt:8,ach:0}},imeis:[],totalImei:0,sales:0});sv(db);S.ph=p;S.stp='otp';S.otp=['','','',''];tst('Registered! Verify OTP')}
+else if(a==='sp'){const v=parseInt(document.getElementById('pv')?.value),r=document.getElementById('pr')?.value;if(!v||!r)return;db.mgrs=db.mgrs.map(m=>m.id===S.md.mid?{...m,pts:m.pts+v}:m);db.tx.unshift({id:'T'+uid(),mid:S.md.mid,tp:v>0?'credit':'debit',pt:Math.abs(v),rs:r,dt:td(),by:'Admin'});sv(db);S.mo=null;tst('Points updated!')}
+else if(a==='sm'){const n=document.getElementById('nn')?.value,p=document.getElementById('np')?.value,s=document.getElementById('ns')?.value,r=document.getElementById('nr')?.value;if(!n||!p||!s)return;db.mgrs.push({id:'M'+uid(),nm:n,ph:p,store:s,pts:0,st:'active',av:n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),tier:'Bronze',str:0,region:r||'West',targets:{MA:{tgt:30,ach:0},MB:{tgt:20,ach:0},MC:{tgt:25,ach:0},MD:{tgt:10,ach:0},ME:{tgt:8,ach:0}},imeis:[],totalImei:0,sales:0});sv(db);S.mo=null;tst('Manager added!')}
+else if(a==='sr'){const n=document.getElementById('rn')?.value,c=document.getElementById('rc')?.value,p=parseInt(document.getElementById('rp')?.value),s=parseInt(document.getElementById('rs')?.value);if(!n||!p||!s)return;db.rw.push({id:'B'+uid(),nm:n,ct:c,pt:p,sk:s,ic:'🎁',bg:'linear-gradient(135deg,#2a2a3a,#1a1a2a)',ds:'Gift card',dm:[p*2],tg:null});sv(db);S.mo=null;tst('Reward added!')}
+else if(a==='add-imei'){addImei()}
+else if(a==='upload-inv'){const m=mg();if(m){db.mgrs=db.mgrs.map(mg=>mg.id===m.id?{...mg,pts:mg.pts+200}:mg);db.tx.unshift({id:'T'+uid(),mid:m.id,tp:'credit',pt:200,rs:'Invoice verified',dt:td(),by:'System'});sv(db);tst('Invoice verified! +200 pts')}}
+else if(a==='do-excel'){S.mo=null;tst('Excel upload simulated — 3 managers created with targets!');const nms=['Demo User 1','Demo User 2','Demo User 3'];nms.forEach((n,i)=>{db.mgrs.push({id:'M'+uid(),nm:n,ph:`+91 ${90000+i*111}00000`,store:`Store-${uid().slice(0,3)}`,pts:0,st:'active',av:n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),tier:'Bronze',str:0,region:REGIONS[i%4],targets:{MA:{tgt:30+i*5,ach:0},MB:{tgt:20+i*3,ach:0},MC:{tgt:25+i*4,ach:0},MD:{tgt:10+i*2,ach:0},ME:{tgt:8+i,ach:0}},imeis:[],totalImei:0,sales:0})});sv(db);R()}
+else if(a==='export'){tst('CSV export simulated — file downloaded!')}
+})});
+document.querySelectorAll('[data-tab]').forEach(el=>{el.addEventListener('click',()=>{S.tab=el.dataset.tab;S.sr='';S.ct='All';R()})});
+document.querySelectorAll('[data-at]').forEach(el=>{el.addEventListener('click',()=>{S.at=el.dataset.at;S.sr='';R()})});
+document.querySelectorAll('[data-br]').forEach(el=>{el.addEventListener('click',()=>{const b=db.rw.find(r=>r.id===el.dataset.br);if(b){S.sh=b.id;S.dm=b.dm[0];R()}})});
+document.querySelectorAll('[data-dm]').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();S.dm=parseInt(el.dataset.dm);R()})});
+document.querySelectorAll('[data-ct]').forEach(el=>{el.addEventListener('click',()=>{S.ct=el.dataset.ct;R()})});
+document.querySelectorAll('[data-inv]').forEach(el=>{el.addEventListener('click',()=>{S.invTab=el.dataset.inv;R()})});
+document.getElementById('bsr')?.addEventListener('input',e=>{S.sr=e.target.value;R()});
+document.getElementById('msr')?.addEventListener('input',e=>{S.sr=e.target.value;R()});
+document.getElementById('phs')?.addEventListener('change',e=>{S.ph=e.target.value;R()});
+document.getElementById('sel-model')?.addEventListener('change',e=>{S.selModel=e.target.value});
+[0,1,2,3].forEach(i=>{document.getElementById(`o${i}`)?.addEventListener('input',e=>{S.otp[i]=e.target.value.slice(-1);if(e.target.value&&i<3){R();setTimeout(()=>document.getElementById(`o${i+1}`)?.focus(),10)}else R()})});
+document.getElementById('aps')?.addEventListener('input',e=>{S.ap=e.target.value});
+document.getElementById('imei-val')?.addEventListener('input',e=>{S.imei=e.target.value.replace(/\D/g,'')});
+document.getElementById('reg-nm')?.addEventListener('input',e=>{S.regNm=e.target.value});
+document.getElementById('reg-ph')?.addEventListener('input',e=>{S.regPh=e.target.value});
+document.querySelectorAll('[data-apv]').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();db.rd=db.rd.map(r=>r.id===el.dataset.apv?{...r,sts:'approved'}:r);sv(db);tst('Approved!')})});
+document.querySelectorAll('[data-rej]').forEach(el=>{el.addEventListener('click',e=>{e.stopPropagation();const rd=db.rd.find(r=>r.id===el.dataset.rej);if(rd){db.rd=db.rd.map(r=>r.id===rd.id?{...r,sts:'rejected'}:r);db.mgrs=db.mgrs.map(m=>m.id===rd.mid?{...m,pts:m.pts+rd.pt}:m);db.rw=db.rw.map(r=>r.id===rd.rid?{...r,sk:r.sk+1}:r);sv(db);tst('Rejected & refunded')}})});
+document.querySelectorAll('[data-ap]').forEach(el=>{el.addEventListener('click',()=>{S.mo='ap';S.md={mid:el.dataset.ap};R()})});
+}
+
+function addImei(){
+const m=mg();if(!m)return;const v=S.imei.trim();
+if(v.length!==15){tst('IMEI must be 15 digits','er');return}
+if(db.imeiLog.includes(v)){tst('⚠ Duplicate IMEI! Already exists.','er');return}
+db.imeiLog.push(v);
+const mod=MODELS.find(md=>md.id===S.selModel);
+db.mgrs=db.mgrs.map(mg=>{if(mg.id!==m.id)return mg;const t={...mg.targets};if(t[S.selModel])t[S.selModel]={...t[S.selModel],ach:t[S.selModel].ach+1};return{...mg,pts:mg.pts+150,imeis:[...mg.imeis,v],totalImei:mg.totalImei+1,targets:t}});
+db.tx.unshift({id:'T'+uid(),mid:m.id,tp:'credit',pt:150,rs:`IMEI: ${mod?.nm||'Device'} — ${v.slice(0,4)}...${v.slice(-4)}`,dt:td(),by:'System'});
+db.nf.unshift({id:'N'+uid(),mid:m.id,mg:`📱 ${mod?.nm} IMEI verified — 150 pts!`,dt:td(),rd:false});
+sv(db);S.imei='';tst(`${mod?.nm} IMEI verified! +150 pts`);
+}
+
+function doRdm(){
+const b=db.rw.find(r=>r.id===S.sh),m=mg();if(!b||!m)return;
+const sd=S.dm||b.dm[0],pn=Math.round(b.pt*(sd/b.dm[0]));
+if(m.pts<pn||b.sk<=0)return;
+db.mgrs=db.mgrs.map(mg=>mg.id===m.id?{...mg,pts:mg.pts-pn}:mg);
+db.rw=db.rw.map(r=>r.id===b.id?{...r,sk:r.sk-1}:r);
+db.tx.unshift({id:'T'+uid(),mid:m.id,tp:'debit',pt:pn,rs:`Redeemed: ${b.nm} ₹${sd.toLocaleString()}`,dt:td(),by:'System'});
+db.rd.unshift({id:'R'+uid(),mid:m.id,rid:b.id,rnm:`${b.nm} ₹${sd.toLocaleString()}`,pt:pn,sts:'pending',dt:td(),dn:sd});
+sv(db);S.sh=null;tst(`${b.nm} ₹${sd.toLocaleString()} redeemed!`);
+}
+
+setTimeout(()=>{S.scr='login';R()},700);
+</script>
+</body>
+</html>
